@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css'/>
+
+    <link rel="stylesheet" href="/stylesheets/kendo/styles/kendo.common.min.css"/>
+    <link rel="stylesheet" href="/stylesheets/kendo/styles/kendo.bootstrap.min.css"/>
+
+    <script src="/javascripts/jquery.min.js"></script>
+    <script src="/javascripts/kendo.all.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            var baseUrl = "http://localhost:3000/projects/";
+
+            var dataSource = new kendo.data.DataSource({
+                transport: {
+                    read: {
+                        url: baseUrl,
+                        dataType: "json",
+                        type: "GET",
+                        contentType: "application/json"
+                    },
+                    update: {
+                        url: function (e) {
+                            return baseUrl + e.models[0]._id;
+                        },
+                        dataType: "json",
+                        type: "PUT",
+                        contentType: "application/json"
+                    },
+                    destroy: {
+                        url: function (e) {
+                            return baseUrl + e.models[0]._id;
+                        },
+                        dataType: "json",
+                        type: "DELETE",
+                        contentType: "application/json"
+                    },
+                    create: {
+                        url: baseUrl,
+                        dataType: "json",
+                        type: "POST",
+                        contentType: "application/json"
+                    },
+                    parameterMap: function (options, operation) {
+                        if (operation !== "read") {
+                            return kendo.stringify(options.models[0]);
+                        }
+                    }
+                },
+                batch: true,
+                pageSize: 20,
+                schema: {
+                    model: {
+                        id: "_id",
+                        fields: {
+                            _id: { editable: false, nullable: true },
+                            name: { validation: { required: true } }
+                        }
+                    }
+                }
+            });
+
+            $("#projectGrid").kendoGrid({
+                dataSource: dataSource,
+                selectable: "row",
+                pageable: true,
+                height: 550,
+                toolbar: ["create"],
+                columns: [
+                    { field: "name", title: "Name", width: "180px" },
+                    { command: ["edit", "destroy"], title: "&nbsp;", width: "250px" }
+                ],
+                editable: "inline"
+            });
+        });
+    </script>
+
+</head>
+<body>
+<h1><%= title %></h1>
+
+<h2>Projects</h2>
+
+<div id="projectGrid"></div>
+
+</body>
+</html>
