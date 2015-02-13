@@ -18,4 +18,8 @@ router.get('/views/sprints', function (req, res) {
     res.render('sprints', { title: 'TeamWare' });
 });
 
+router.get('/views/sprintsbyteam', function (req, res) {
+    res.render('sprintsbyteam', {title: 'TeamWare'});
+});
+
 module.exports = router;
