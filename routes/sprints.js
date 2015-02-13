@@ -42,8 +42,8 @@ router.post('/', function (req, res, next) {
 });
 
 //Update by Id
-router.put(':/id', function (req, res, next) {
-    Sprint.findByIdAndUpdate(req.params, req.body, function (err, post) {
+router.put('/:id', function (req, res, next) {
+    Sprint.findByIdAndUpdate(req.params.id, req.body, function (err, post) {
         if (err) {
             return next(err);
         }
@@ -54,7 +54,7 @@ router.put(':/id', function (req, res, next) {
 });
 
 //Delete by Id
-router.delete(':/id', function (req, res, next) {
+router.delete('/:id', function (req, res, next) {
     Sprint.findByIdAndRemove(req.params.id, req.body, function (err, post) {
         if (err) {
             return next(err);
