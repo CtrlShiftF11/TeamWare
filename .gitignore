@@ -1,0 +1,5 @@
+.idea/
+bin/
+npm-debug.log
+node_modules
+teamware.iml
