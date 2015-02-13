@@ -24,7 +24,7 @@
                     },
                     update: {
                         url: function (e) {
-                            return baseUrl + e.models[0]._id;
+                            return baseUrl + e._id;
                         },
                         dataType: "json",
                         type: "PUT",
@@ -32,7 +32,7 @@
                     },
                     destroy: {
                         url: function (e) {
-                            return baseUrl + e.models[0]._id;
+                            return baseUrl + e._id;
                         },
                         dataType: "json",
                         type: "DELETE",
@@ -46,11 +46,10 @@
                     },
                     parameterMap: function (options, operation) {
                         if (operation !== "read") {
-                            return kendo.stringify(options.models[0]);
+                            return kendo.stringify(options);
                         }
                     }
                 },
-                batch: true,
                 pageSize: 20,
                 schema: {
                     model: {
