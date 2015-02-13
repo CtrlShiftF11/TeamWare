@@ -29,6 +29,19 @@ router.get('/:id', function (req, res, next) {
     });
 });
 
+//Get by TeamId and Order by Sprint End Date
+router.get('/getbyteam/:team_id', function (req, res, next) {
+    var query = Sprint.find({"team_id": req.params.team_id}).sort({"end_date": 1});
+    query.exec(function (err, post) {
+        if (err) {
+            return next(err);
+        }
+        else {
+            res.json(post);
+        }
+    });
+});
+
 //Create
 router.post('/', function (req, res, next) {
     Sprint.create(req.body, function (err, post) {
