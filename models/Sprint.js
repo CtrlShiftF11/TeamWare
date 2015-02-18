@@ -1,6 +1,12 @@
 //Andy Sandefer
 var mongoose = require('mongoose');
 
+var SprintCommentSchema = new mongoose.Schema({
+    user_name: String,
+    comment_text: String,
+    last_modified_date: { type: Date, default: Date.now }
+});
+
 var SprintSchema = new mongoose.Schema({
     team_id: mongoose.Schema.Types.ObjectId,
     project_id: mongoose.Schema.Types.ObjectId,
@@ -12,7 +18,8 @@ var SprintSchema = new mongoose.Schema({
     standard_story_points: Number,
     research_spike_points: Number,
     refactor_points: Number,
-    last_modified_date: { type: Date, default: Date.now }
+    last_modified_date: { type: Date, default: Date.now },
+    comments: [SprintCommentSchema]
 });
 
 module.exports = mongoose.model('Sprint', SprintSchema);
