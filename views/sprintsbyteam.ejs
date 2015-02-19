@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css'/>
+
+    <link rel="stylesheet" href="/stylesheets/kendo/styles/kendo.common.min.css"/>
+    <link rel="stylesheet" href="/stylesheets/kendo/styles/kendo.bootstrap.min.css"/>
+
+    <script src="/javascripts/jquery.min.js"></script>
+    <script src="/javascripts/kendo.all.min.js"></script>
+    <script src="/javascripts/highcharts.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            var baseUrl = "http://localhost:3000/";
+            $("#teamList").kendoDropDownList({
+                dataValueField: "_id",
+                dataTextField: "name",
+                dataSource: {
+                    transport: {
+                        read: {
+                            url: "http://localhost:3000/teams",
+                            dataType: "json",
+                            type: "GET",
+                            contentType: "application/json"
+                        }
+                    }
+                },
+                dataBound: function (e) {
+                    getSprintByTeam(this.value());
+                },
+                change: function (e) {
+                    getSprintByTeam(this.value());
+                }
+            });
+
+            function getSprintByTeam(teamId) {
+                $.when($.getJSON('http://localhost:3000/teams'))
+                        .done(function (teamData) {
+                            $.getJSON('http://localhost:3000/sprints/getbyteam/' + teamId)
+                                    .done(function (sprintData) {
+                                        renderChart(sprintData);
+                                    });
+                        });
+            }
+
+            function renderChart(sprintData) {
+                var chartOptions = {
+                    chart: {
+                        renderTo: 'container',
+                        type: 'column'
+                    },
+                    title: {
+                        text: 'Work Composition by Sprint'
+                    },
+                    xAxis: {
+                        type: 'datetime',
+                        labels: {
+                            formatter: function () {
+                                return Highcharts.dateFormat('%m/%d/%y', this.value);
+                            }
+                        }
+                    },
+                    series: [
+                        {
+                            name: 'Story Points',
+                            data: []
+                        },
+                        {
+                            name: 'Research Spike Points',
+                            data: []
+                        },
+                        {
+                            name: 'Refactor Points',
+                            data: []
+                        }
+                    ],
+                    plotOptions: {
+                        column: {
+                            stacking: 'normal'
+                        }
+                    }
+                };
+                for (var i = 0; i < sprintData.length; i++) {
+                    console.log(sprintData[i].end_date);
+                    chartOptions.series[0].data.push([Date.parse(sprintData[i].end_date), sprintData[i].standard_story_points]);
+                    chartOptions.series[1].data.push([Date.parse(sprintData[i].end_date), sprintData[i].research_spike_points]);
+                    chartOptions.series[2].data.push([Date.parse(sprintData[i].end_date), sprintData[i].refactor_points]);
+                }
+                var chart = new Highcharts.Chart(chartOptions);
+            }
+
+        });
+    </script>
+
+</head>
+<body>
+<h1><%= title %></h1>
+
+<div id="teamList"></div>
+<div id="container"></div>
+
+</body>
+</html>
