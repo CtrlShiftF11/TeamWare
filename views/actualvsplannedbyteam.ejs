@@ -49,10 +49,10 @@
                 var chartOptions = {
                     chart: {
                         renderTo: 'container',
-                        type: 'column'
+                        type: 'spline'
                     },
                     title: {
-                        text: 'Work Composition by Sprint'
+                        text: 'Planned vs. Actual by Sprint'
                     },
                     xAxis: {
                         type: 'datetime',
@@ -64,28 +64,18 @@
                     },
                     series: [
                         {
-                            name: 'Story Points',
+                            name: 'Actual Points',
                             data: []
                         },
                         {
-                            name: 'Research Spike Points',
-                            data: []
-                        },
-                        {
-                            name: 'Refactor Points',
+                            name: 'Planned Points',
                             data: []
                         }
-                    ],
-                    plotOptions: {
-                        column: {
-                            stacking: 'normal'
-                        }
-                    }
+                    ]
                 };
                 for (var i = 0; i < sprintData.length; i++) {
-                    chartOptions.series[0].data.push([Date.parse(sprintData[i].end_date), sprintData[i].standard_story_points]);
-                    chartOptions.series[1].data.push([Date.parse(sprintData[i].end_date), sprintData[i].research_spike_points]);
-                    chartOptions.series[2].data.push([Date.parse(sprintData[i].end_date), sprintData[i].refactor_points]);
+                    chartOptions.series[0].data.push([Date.parse(sprintData[i].end_date), sprintData[i].actual_points]);
+                    chartOptions.series[1].data.push([Date.parse(sprintData[i].end_date), sprintData[i].planned_points]);
                 }
                 var chart = new Highcharts.Chart(chartOptions);
             }
