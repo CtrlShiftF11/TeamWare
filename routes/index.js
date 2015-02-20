@@ -26,4 +26,8 @@ router.get('/views/actualvsplannedbyteam', function (req, res) {
     res.render('actualvsplannedbyteam', {title: 'TeamWare'});
 });
 
+router.get('/views/actualvsplannedbyproject', function (req, res) {
+    res.render('actualvsplannedbyproject', {title: 'TeamWare'});
+});
+
 module.exports = router;

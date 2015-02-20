@@ -42,6 +42,29 @@ router.get('/getbyteam/:team_id', function (req, res, next) {
     });
 });
 
+//Get by ProjectId and Order by Sprint End Date
+router.get('/getbyproject/:project_id', function (req, res, next) {
+    var query = Sprint.aggregate([
+        {$match: {project: req.params.project_id}},
+        {
+            $group: {
+                date: '$end_date',
+                actual_points: {$sum: '$actual_points'},
+                planned_points: {$sum: '$planned_points'}
+            }
+        }
+    ]);
+
+    query.exec(function (err, post) {
+        if (err) {
+            return next(err);
+        }
+        else {
+            res.json(post);
+        }
+    });
+});
+
 //Create
 router.post('/', function (req, res, next) {
     Sprint.create(req.body, function (err, post) {

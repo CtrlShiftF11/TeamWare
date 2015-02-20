@@ -13,7 +13,6 @@
 
     <script>
         $(document).ready(function () {
-            var baseUrl = "http://localhost:3000/";
             $("#teamList").kendoDropDownList({
                 dataValueField: "_id",
                 dataTextField: "name",
@@ -36,12 +35,9 @@
             });
 
             function getSprintByTeam(teamId) {
-                $.when($.getJSON('http://localhost:3000/teams'))
-                        .done(function (teamData) {
-                            $.getJSON('http://localhost:3000/sprints/getbyteam/' + teamId)
-                                    .done(function (sprintData) {
-                                        renderChart(sprintData);
-                                    });
+                $.getJSON('http://localhost:3000/sprints/getbyteam/' + teamId)
+                        .done(function (sprintData) {
+                            renderChart(sprintData);
                         });
             }
 

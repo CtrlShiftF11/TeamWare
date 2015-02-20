@@ -46,6 +46,7 @@ app.use('/views/teams', teams);
 app.use('/views/sprints', sprints);
 app.use('/views/sprintsbyteam', sprints);
 app.use('/views/actualvsplannedbyteam', sprints);
+app.use('/views/actualvsplannedbyproject', sprints);
 
 //API Routes
 app.use('/projects', projects);
