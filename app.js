@@ -41,6 +41,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 
 //Page Routes...
+app.use('/views/about', routes);
 app.use('/views/projects', routes);
 app.use('/views/teams', teams);
 app.use('/views/sprints', sprints);

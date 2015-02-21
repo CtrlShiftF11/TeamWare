@@ -6,6 +6,18 @@ router.get('/', function (req, res) {
     res.render('index', { title: 'TeamWare | Home' });
 });
 
+router.get('/index', function (req, res) {
+    res.render('index', { title: 'TeamWare | Home' });
+});
+
+router.get('/views/index', function (req, res) {
+    res.render('index', { title: 'TeamWare | Home' });
+});
+
+router.get('/views/about', function (req, res) {
+    res.render('about', { title: 'TeamWare | Home' });
+});
+
 router.get('/views/projects', function (req, res) {
     res.render('projects', {title: 'TeamWare | Projects' });
 });

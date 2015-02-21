@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-  </body>
+<%= include partials/navmenu %>
+<body>
+
+<ul>
+    <li><a href="/views/sprintsbyteam">Sprint Work Composition by Team</a></li>
+    <li><a href="/views/actualvsplannedbyteam">Actual vs Planned by Team</a></li>
+    <li><a href="/views/actualvsplannedbyproject">Actual vs Planned by Project</a></li>
+</ul>
+
+</body>
 </html>

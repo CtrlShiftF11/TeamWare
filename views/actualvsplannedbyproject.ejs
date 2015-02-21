@@ -1,16 +1,7 @@
 <!DOCTYPE html>
 <html>
+<%= include partials/navmenu %>
 <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css'/>
-
-    <link rel="stylesheet" href="/stylesheets/kendo/styles/kendo.common.min.css"/>
-    <link rel="stylesheet" href="/stylesheets/kendo/styles/kendo.bootstrap.min.css"/>
-
-    <script src="/javascripts/jquery.min.js"></script>
-    <script src="/javascripts/kendo.all.min.js"></script>
-    <script src="/javascripts/highcharts.js"></script>
-
     <script>
         $(document).ready(function () {
             $("#projectList").kendoDropDownList({
@@ -44,7 +35,7 @@
             function renderChart(sprintData) {
                 var chartOptions = {
                     chart: {
-                        renderTo: 'container',
+                        renderTo: 'chartContainer',
                         type: 'spline'
                     },
                     title: {
@@ -84,10 +75,9 @@
 
 </head>
 <body>
-<h1><%= title %></h1>
 
 <div id="projectList"></div>
-<div id="container"></div>
+<div id="chartContainer"></div>
 
 </body>
 </html>
