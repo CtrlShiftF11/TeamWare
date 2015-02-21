@@ -31,7 +31,7 @@ router.get('/:id', function (req, res, next) {
 
 //Get by TeamId and Order by Sprint End Date
 router.get('/getbyteam/:team_id', function (req, res, next) {
-    var query = Sprint.find({"team_id": req.params.team_id}).sort({"end_date": 1});
+    var query = Sprint.find({"team_id": req.params.team_id}).sort({"end_date": -1});
     query.exec(function (err, post) {
         if (err) {
             return next(err);
@@ -45,14 +45,15 @@ router.get('/getbyteam/:team_id', function (req, res, next) {
 //Get by ProjectId and Order by Sprint End Date
 router.get('/getbyproject/:project_id', function (req, res, next) {
     var query = Sprint.aggregate([
-        {$match: {project: req.params.project_id}},
+        { $match: { project_id: mongoose.Types.ObjectId(req.params.project_id) }},
         {
             $group: {
-                date: '$end_date',
-                actual_points: {$sum: '$actual_points'},
-                planned_points: {$sum: '$planned_points'}
+                _id: { month: { $month: '$end_date' }, dayOfMonth: { $dayOfMonth: '$end_date' }, year: { $year: '$end_date' } },
+                actual_points: { $sum: '$actual_points' },
+                planned_points: { $sum: '$planned_points' }
             }
-        }
+        },
+        { $sort: { '_id.year': 1, '_id.month': 1, '_id.dayOfMonth': 1}}
     ]);
 
     query.exec(function (err, post) {

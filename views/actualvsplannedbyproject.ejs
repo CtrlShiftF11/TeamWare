@@ -70,8 +70,11 @@
                     ]
                 };
                 for (var i = 0; i < sprintData.length; i++) {
-                    chartOptions.series[0].data.push([Date.parse(sprintData[i].end_date), sprintData[i].actual_points]);
-                    chartOptions.series[1].data.push([Date.parse(sprintData[i].end_date), sprintData[i].planned_points]);
+                    var d = new Date();
+                    d.setFullYear(sprintData[i]._id.year, sprintData[i]._id.month - 1, sprintData[i]._id.dayOfMonth);
+                    var endDate = d.toJSON();
+                    chartOptions.series[0].data.push([Date.parse(endDate), sprintData[i].actual_points]);
+                    chartOptions.series[1].data.push([Date.parse(endDate), sprintData[i].planned_points]);
                 }
                 var chart = new Highcharts.Chart(chartOptions);
             }
