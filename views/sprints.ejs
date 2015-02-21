@@ -23,6 +23,22 @@
                         loadSprintGrid(teams, projects);
                     });
 
+            function showComment(e) {
+                var wnd = $("#sprintComment")
+                        .kendoWindow({
+                            title: "Sprint Comment",
+                            modal: true,
+                            visible: false,
+                            resizable: false,
+                            width: 400,
+                            height: 300
+                        }).data("kendoWindow");
+                e.preventDefault();
+                //var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+                console.log(e);
+                wnd.center().open();
+            }
+
             function loadSprintGrid(teams, projects) {
                 var baseUrl = "http://localhost:3000/sprints/";
                 var dataSource = new kendo.data.DataSource({
@@ -102,7 +118,9 @@
                         { field: "research_spike_points", title: "Research Spike Points", width: "100px"},
                         { field: "refactor_points", title: "Refactor Points", width: "80px"},
                         { field: "non_scored_tasks", title: "Non Scored Tasks", width: "100px"},
-                        { command: ["edit", "destroy"], title: "&nbsp;", width: "250px" }
+                        { command: ["edit", "destroy", {name: "Comment", click: function (e) {
+                            showComment(e);
+                        }}], title: "&nbsp;", width: "250px" }
                     ],
                     editable: "inline"
                 });
@@ -113,7 +131,7 @@
 
 </head>
 <body>
-
+<div id="sprintComment"></div>
 <div id="sprintGrid"></div>
 
 </body>
