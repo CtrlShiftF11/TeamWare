@@ -4,6 +4,7 @@
 <head>
     <script>
         $(document).ready(function () {
+            //Get Teams and Projects for grid drop down lists...
             $.when($.getJSON('http://localhost:3000/teams'), $.getJSON('http://localhost:3000/projects'))
                     .done(function (teamData, projectData) {
                         var teams = [];
@@ -23,21 +24,57 @@
                         loadSprintGrid(teams, projects);
                     });
 
+            //Sprint Comment User List - NOTE: This is prototype code that I'll replace with a dynamic db driven list at a later date...
+            var userList = ['', 'Andy Sandefer', 'Brian Thayer', 'Bryan Everly', 'Chris Lenzo', 'Jennifer Davis', 'Roy Stecker', 'Tamara Schultz'];
+            $("#userList").kendoDropDownList({
+                dataSource: userList
+            });
+
             function showComment(e) {
-                var wnd = $("#sprintComment")
+                sprintCommentWin = $("#sprintCommentDialog")
                         .kendoWindow({
                             title: "Sprint Comment",
                             modal: true,
                             visible: false,
                             resizable: false,
-                            width: 400,
-                            height: 300
+                            width: 440,
+                            height: 380
                         }).data("kendoWindow");
                 e.preventDefault();
-                //var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
-                console.log(e);
-                wnd.center().open();
+                var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+                window.selectedSprintId = dataItem._id;
+                sprintCommentWin.center().open();
             }
+
+            $("#btnSaveComment").on('click', function (e) {
+                var sprint = {
+                    _id: window.selectedSprintId,
+                    comments: {
+                        user_name: $("#userList").val(),
+                        comment_text: $("#sprintComment").val()
+                    }
+                };
+                $.ajax({
+                    url: "http://localhost:3000/sprints/" + sprint._id + "/addcomment",
+                    type: "PUT",
+                    dataType: "json",
+                    data: kendo.stringify(sprint),
+                    contentType: "application/json"
+                })
+                        .done(function (res) {
+                            sprintCommentWin.close();
+                        })
+                        .fail(function () {
+                            alert('Unable to save sprint comment.');
+                        })
+                        .always(function () {
+                            window.selectedSprintId = null;
+                        });
+            });
+            $("#btnCancelComment").on('click', function (e) {
+                window.selectedSprintId = null;
+                sprintCommentWin.close();
+            });
 
             function loadSprintGrid(teams, projects) {
                 var baseUrl = "http://localhost:3000/sprints/";
@@ -118,11 +155,12 @@
                         { field: "research_spike_points", title: "Research Spike Points", width: "100px"},
                         { field: "refactor_points", title: "Refactor Points", width: "80px"},
                         { field: "non_scored_tasks", title: "Non Scored Tasks", width: "100px"},
-                        { command: ["edit", "destroy", {name: "Comment", click: function (e) {
-                            showComment(e);
-                        }}], title: "&nbsp;", width: "250px" }
+                        { command: ["edit", "destroy", {name: "Comment", click: showComment}], title: "&nbsp;", width: "250px" }
                     ],
-                    editable: "inline"
+                    editable: "inline",
+                    dataBound: function (e) {
+                        this.select(e.sender.tbody.find("tr:first"));
+                    }
                 });
             }
 
@@ -131,7 +169,26 @@
 
 </head>
 <body>
-<div id="sprintComment"></div>
+<div id="sprintCommentDialog" style="display:none;">
+    <div class="well">
+        <div style="padding-top: 4px; padding-bottom: 4px;">
+            <label for="userList">Commenter</label>
+
+            <div id="userList"></div>
+        </div>
+
+        <div style="clear:both;"></div>
+        <textarea id="sprintComment" name="sprintComment" style="width:340px; height: 220px;" placeholder="Sprint comments..."></textarea>
+
+        <div>
+            <button id="btnSaveComment" class="btn btn-default">
+                <span class="glyphicon glyphicon-align-left glyphicon-floppy-save">Save</span>
+            </button>
+            <button id="btnCancelComment" class="btn btn-default">Cancel</button>
+        </div>
+    </div>
+</div>
+
 <div id="sprintGrid"></div>
 
 </body>

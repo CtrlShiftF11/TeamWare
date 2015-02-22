@@ -90,6 +90,27 @@ router.put('/:id', function (req, res, next) {
     });
 });
 
+//Add Comment to existing Sprint record
+router.put('/:id/addcomment', function (req, res, next) {
+    Sprint.findByIdAndUpdate(req.params.id,
+        {
+            $push: {
+                comments: {
+                    user_name: req.body.comments.user_name,
+                    comment_text: req.body.comments.comment_text
+                }
+            }
+        },
+        function (err, post) {
+            if (err) {
+                return next(err);
+            }
+            else {
+                res.json(post);
+            }
+        });
+});
+
 //Delete by Id
 router.delete('/:id', function (req, res, next) {
     Sprint.findByIdAndRemove(req.params.id, req.body, function (err, post) {
