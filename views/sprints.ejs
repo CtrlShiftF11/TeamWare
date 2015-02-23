@@ -43,12 +43,38 @@
                             modal: true,
                             visible: false,
                             resizable: false,
-                            width: 440,
+                            width: 840,
                             height: 380
                         }).data("kendoWindow");
                 e.preventDefault();
                 var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
                 window.selectedSprintId = dataItem._id;
+                $.getJSON('/sprints/' + dataItem._id)
+                        .done(function (sprintComments) {
+                            console.log(sprintComments.comments);
+                            $("#sprintCommentsGrid").kendoGrid({
+                                dataSource: {
+                                    data: sprintComments.comments
+                                },
+                                pageable: true,
+                                selectable: "row",
+                                resizable: true,
+                                sortable: true,
+                                filterable: true,
+                                height: 300,
+                                dataBound: function (e) {
+                                    this.select(e.sender.tbody.find("tr:first"));
+                                },
+                                onChange: function (e) {
+                                },
+                                columns: [
+                                    { field: "user_name", title: "Commenter", width: 120},
+                                    { field: "comment_text", title: "Comment"}
+                                ]
+                            });
+                        }
+                )
+                ;
                 sprintCommentWin.center().open();
             }
 
@@ -170,13 +196,17 @@
                 });
             }
 
-        });
+        })
+        ;
     </script>
 
 </head>
 <body>
 <div id="sprintCommentDialog" style="display:none;">
-    <div class="well">
+    <div class="well pull-left">
+        <div id="sprintCommentsGrid" style="width: 450px;"></div>
+    </div>
+    <div class="well pull-right">
         <div style="padding-top: 4px; padding-bottom: 4px;">
             <label for="userList">Commenter</label>
 
@@ -184,7 +214,7 @@
         </div>
 
         <div style="clear:both;"></div>
-        <textarea id="sprintComment" name="sprintComment" style="width:340px; height: 220px;" placeholder="Sprint comments..."></textarea>
+        <textarea id="sprintComment" name="sprintComment" style="width:250px; height: 220px;" placeholder="Sprint comments..."></textarea>
 
         <div>
             <button id="btnSaveComment" class="btn btn-default">
