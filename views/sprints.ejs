@@ -5,7 +5,7 @@
     <script>
         $(document).ready(function () {
             //Get Teams and Projects for grid drop down lists...
-            $.when($.getJSON('http://localhost:3000/teams'), $.getJSON('http://localhost:3000/projects'))
+            $.when($.getJSON('/teams'), $.getJSON('/projects'))
                     .done(function (teamData, projectData) {
                         var teams = [];
                         for (var i = 0; i < teamData[0].length; i++) {
@@ -61,7 +61,7 @@
                     }
                 };
                 $.ajax({
-                    url: "http://localhost:3000/sprints/" + sprint._id + "/addcomment",
+                    url: "/sprints/" + sprint._id + "/addcomment",
                     type: "PUT",
                     dataType: "json",
                     data: kendo.stringify(sprint),
@@ -83,7 +83,7 @@
             });
 
             function loadSprintGrid(teams, projects) {
-                var baseUrl = "http://localhost:3000/sprints/";
+                var baseUrl = "/sprints/";
                 var dataSource = new kendo.data.DataSource({
                     transport: {
                         read: {

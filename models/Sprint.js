@@ -19,7 +19,10 @@ var SprintSchema = new mongoose.Schema({
     research_spike_points: Number,
     refactor_points: Number,
     last_modified_date: { type: Date, default: Date.now },
-    comments: [SprintCommentSchema]
+    comments: [SprintCommentSchema],
+    new_defects: Number,
+    new_escapes: Number,
+    total_remaining_defects: Number
 });
 
 module.exports = mongoose.model('Sprint', SprintSchema);

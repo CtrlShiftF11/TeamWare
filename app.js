@@ -28,7 +28,6 @@ mongoose.connect('mongodb://localhost/teamware', function (err) {
     }
 });
 
-
 // uncomment after placing your favicon in /public
 //app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));

@@ -10,7 +10,7 @@
                 dataSource: {
                     transport: {
                         read: {
-                            url: "http://localhost:3000/projects",
+                            url: "/projects",
                             dataType: "json",
                             type: "GET",
                             contentType: "application/json"
@@ -26,7 +26,7 @@
             });
 
             function getSprintByProject(projectId) {
-                $.getJSON('http://localhost:3000/sprints/getbyproject/' + projectId)
+                $.getJSON('/sprints/getbyproject/' + projectId)
                         .done(function (sprintData) {
                             renderChart(sprintData);
                         });
