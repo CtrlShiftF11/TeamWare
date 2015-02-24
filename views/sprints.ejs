@@ -2,203 +2,218 @@
 <html>
 <%= include partials/navmenu %>
 <head>
-    <script>
-        $(document).ready(function () {
-            //Get Teams and Projects for grid drop down lists...
-            $.when($.getJSON('/teams'), $.getJSON('/projects'))
-                    .done(function (teamData, projectData) {
-                        var teams = [];
-                        for (var i = 0; i < teamData[0].length; i++) {
-                            var team = {};
-                            team.value = teamData[0][i]._id;
-                            team.text = teamData[0][i].name;
-                            teams.push(team);
-                        }
-                        var projects = [];
-                        for (var j = 0; j < projectData[0].length; j++) {
-                            var project = {};
-                            project.value = projectData[0][j]._id;
-                            project.text = projectData[0][j].name;
-                            projects.push(project);
-                        }
-                        loadSprintGrid(teams, projects);
+<script>
+$(document).ready(function () {
+    //Get Teams and Projects for grid drop down lists...
+    $.when($.getJSON('/teams'), $.getJSON('/projects'))
+            .done(function (teamData, projectData) {
+                var teams = [];
+                for (var i = 0; i < teamData[0].length; i++) {
+                    var team = {};
+                    team.value = teamData[0][i]._id;
+                    team.text = teamData[0][i].name;
+                    teams.push(team);
+                }
+                var projects = [];
+                for (var j = 0; j < projectData[0].length; j++) {
+                    var project = {};
+                    project.value = projectData[0][j]._id;
+                    project.text = projectData[0][j].name;
+                    projects.push(project);
+                }
+                loadSprintGrid(teams, projects);
+            });
+
+    //Sprint Comment User List - NOTE: This is prototype code that I'll replace with a dynamic db driven list at a later date...
+    var userList = ['', 'Andy Sandefer', 'Brian Thayer', 'Bryan Everly', 'Chris Lenzo', 'Jennifer Davis', 'Roy Stecker', 'Tamara Schultz'];
+    $("#userList").kendoDropDownList({
+        dataSource: userList
+    });
+
+    function showComment(e) {
+        sprintCommentWin = $("#sprintCommentDialog")
+                .kendoWindow({
+                    title: "Sprint Comment",
+                    modal: true,
+                    visible: false,
+                    resizable: false,
+                    width: 840,
+                    height: 380
+                }).data("kendoWindow");
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        window.selectedSprintId = dataItem._id;
+        $.getJSON('/sprints/' + dataItem._id)
+                .done(function (sprintComments) {
+                    $("#sprintCommentsGrid").kendoGrid({
+                        dataSource: {
+                            data: sprintComments.comments,
+                            pageSize: 8
+                        },
+                        pageable: true,
+                        selectable: "row",
+                        resizable: true,
+                        sortable: true,
+                        filterable: true,
+                        height: 300,
+                        dataBound: function (e) {
+                            this.select(e.sender.tbody.find("tr:first"));
+                            var grid = e.sender;
+                            var row = grid.dataItem(this.select());
+                            setCommentCard(row);
+                        },
+                        change: function (e) {
+                            var grid = e.sender;
+                            var row = grid.dataItem(this.select());
+                            setCommentCard(row);
+                        },
+                        columns: [
+                            { field: "user_name", title: "Commenter", width: 120},
+                            { field: "comment_text", title: "Comment"}
+                        ]
                     });
-
-            //Sprint Comment User List - NOTE: This is prototype code that I'll replace with a dynamic db driven list at a later date...
-            var userList = ['', 'Andy Sandefer', 'Brian Thayer', 'Bryan Everly', 'Chris Lenzo', 'Jennifer Davis', 'Roy Stecker', 'Tamara Schultz'];
-            $("#userList").kendoDropDownList({
-                dataSource: userList
-            });
-
-            /*
-             ToDo: This dialog needs to be transformed into a master/detail view with a list of existing sprint comments on the left
-             ToDo: and a comment editor on the right!
-             */
-
-
-            function showComment(e) {
-                sprintCommentWin = $("#sprintCommentDialog")
-                        .kendoWindow({
-                            title: "Sprint Comment",
-                            modal: true,
-                            visible: false,
-                            resizable: false,
-                            width: 840,
-                            height: 380
-                        }).data("kendoWindow");
-                e.preventDefault();
-                var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
-                window.selectedSprintId = dataItem._id;
-                $.getJSON('/sprints/' + dataItem._id)
-                        .done(function (sprintComments) {
-                            console.log(sprintComments.comments);
-                            $("#sprintCommentsGrid").kendoGrid({
-                                dataSource: {
-                                    data: sprintComments.comments
-                                },
-                                pageable: true,
-                                selectable: "row",
-                                resizable: true,
-                                sortable: true,
-                                filterable: true,
-                                height: 300,
-                                dataBound: function (e) {
-                                    this.select(e.sender.tbody.find("tr:first"));
-                                },
-                                onChange: function (e) {
-                                },
-                                columns: [
-                                    { field: "user_name", title: "Commenter", width: 120},
-                                    { field: "comment_text", title: "Comment"}
-                                ]
-                            });
-                        }
-                )
-                ;
-                sprintCommentWin.center().open();
-            }
-
-            $("#btnSaveComment").on('click', function (e) {
-                var sprint = {
-                    _id: window.selectedSprintId,
-                    comments: {
-                        user_name: $("#userList").val(),
-                        comment_text: $("#sprintComment").val()
-                    }
-                };
-                $.ajax({
-                    url: "/sprints/" + sprint._id + "/addcomment",
-                    type: "PUT",
-                    dataType: "json",
-                    data: kendo.stringify(sprint),
-                    contentType: "application/json"
-                })
-                        .done(function (res) {
-                            sprintCommentWin.close();
-                        })
-                        .fail(function () {
-                            alert('Unable to save sprint comment.');
-                        })
-                        .always(function () {
-                            window.selectedSprintId = null;
-                        });
-            });
-            $("#btnCancelComment").on('click', function (e) {
-                window.selectedSprintId = null;
-                sprintCommentWin.close();
-            });
-
-            function loadSprintGrid(teams, projects) {
-                var baseUrl = "/sprints/";
-                var dataSource = new kendo.data.DataSource({
-                    transport: {
-                        read: {
-                            url: baseUrl,
-                            dataType: "json",
-                            type: "GET",
-                            contentType: "application/json"
-                        },
-                        update: {
-                            url: function (e) {
-                                return baseUrl + e._id;
-                            },
-                            dataType: "json",
-                            type: "PUT",
-                            contentType: "application/json"
-                        },
-                        destroy: {
-                            url: function (e) {
-                                return baseUrl + e._id;
-                            },
-                            dataType: "json",
-                            type: "DELETE",
-                            contentType: "application/json"
-                        },
-                        create: {
-                            url: baseUrl,
-                            dataType: "json",
-                            type: "POST",
-                            contentType: "application/json"
-                        },
-                        parameterMap: function (options, operation) {
-                            if (operation !== "read") {
-                                return kendo.stringify(options);
-                            }
-                        }
-                    },
-                    pageSize: 20,
-                    schema: {
-                        model: {
-                            id: "_id",
-                            fields: {
-                                _id: { editable: false, nullable: true },
-                                start_date: { type: "date", validation: { required: true }},
-                                end_date: { type: "date", validation: { required: true }},
-                                team_id: { field: "team_id", type: "string", validation: { required: true }, defaultValue: teams[0].value },
-                                project_id: { field: "project_id", type: "string", validation: { required: true }, defaultValue: projects[0].value },
-                                planned_points: { type: "number", validation: { required: true }},
-                                actual_points: { type: "number", validation: { required: true }},
-                                non_scored_tasks: { type: "number", validation: { required: true }},
-                                standard_story_points: { type: "number", validation: { required: true }},
-                                research_spike_points: { type: "number", validation: { required: true }},
-                                refactor_points: { type: "number", validation: { required: true }}
-                            }
-                        }
-                    }
                 });
+        sprintCommentWin.center().open();
+    }
 
-                $("#sprintGrid").kendoGrid({
-                    dataSource: dataSource,
-                    pageable: true,
-                    selectable: "row",
-                    resizable: true,
-                    sortable: true,
-                    filterable: true,
-                    height: 450,
-                    toolbar: ["create"],
-                    columns: [
-                        { field: "start_date", title: "Start Date", width: "100px", template: '#= kendo.toString(start_date, "MM/dd/yyyy") #' },
-                        { field: "end_date", title: "End Date", width: "100px", template: '#= kendo.toString(end_date, "MM/dd/yyyy") #' },
-                        { field: "team_id", title: "Team", width: "180px", values: teams },
-                        { field: "project_id", title: "Project", width: "180px", values: projects },
-                        { field: "planned_points", title: "Planned Points", width: "80px"},
-                        { field: "actual_points", title: "Actual Points", width: "80px"},
-                        { field: "standard_story_points", title: "Story Points", width: "80px"},
-                        { field: "research_spike_points", title: "Research Spike Points", width: "100px"},
-                        { field: "refactor_points", title: "Refactor Points", width: "80px"},
-                        { field: "non_scored_tasks", title: "Non Scored Tasks", width: "100px"},
-                        { command: ["edit", "destroy", {name: "Comment", click: showComment}], title: "&nbsp;", width: "250px" }
-                    ],
-                    editable: "inline",
-                    dataBound: function (e) {
-                        this.select(e.sender.tbody.find("tr:first"));
-                    }
-                });
+    function setCommentCard(gridRow) {
+        var userDropDownList = $("#userList").data("kendoDropDownList");
+        userDropDownList.value(gridRow.user_name);
+        $("#sprintComment").val(gridRow.comment_text);
+    }
+
+    $("#btnSaveComment").on('click', function (e) {
+        if (($("#userList").val() == '') || ($("#sprintComment").val() == '')) {
+            alert('Please select a commenter and enter a comment.');
+            return false;
+        }
+        var sprint = {
+            _id: window.selectedSprintId,
+            comments: {
+                user_name: $("#userList").val(),
+                comment_text: $("#sprintComment").val()
             }
-
+        };
+        $.ajax({
+            url: "/sprints/" + sprint._id + "/addcomment",
+            type: "PUT",
+            dataType: "json",
+            data: kendo.stringify(sprint),
+            contentType: "application/json"
         })
-        ;
-    </script>
+                .done(function (res) {
+                    sprintCommentWin.close();
+                })
+                .fail(function () {
+                    alert('Unable to save sprint comment.');
+                })
+                .always(function () {
+                    window.selectedSprintId = null;
+                });
+    });
+
+    $("#btnCancelComment").on('click', function (e) {
+        window.selectedSprintId = null;
+        sprintCommentWin.close();
+    });
+
+    $("#btnAddComment").on('click', function (e) {
+        var userDropDownList = $("#userList").data("kendoDropDownList");
+        userDropDownList.value("");
+        $("#userList").focus();
+        $("#sprintComment").val("");
+    });
+
+    function loadSprintGrid(teams, projects) {
+        var baseUrl = "/sprints/";
+        var dataSource = new kendo.data.DataSource({
+            transport: {
+                read: {
+                    url: baseUrl,
+                    dataType: "json",
+                    type: "GET",
+                    contentType: "application/json"
+                },
+                update: {
+                    url: function (e) {
+                        return baseUrl + e._id;
+                    },
+                    dataType: "json",
+                    type: "PUT",
+                    contentType: "application/json"
+                },
+                destroy: {
+                    url: function (e) {
+                        return baseUrl + e._id;
+                    },
+                    dataType: "json",
+                    type: "DELETE",
+                    contentType: "application/json"
+                },
+                create: {
+                    url: baseUrl,
+                    dataType: "json",
+                    type: "POST",
+                    contentType: "application/json"
+                },
+                parameterMap: function (options, operation) {
+                    if (operation !== "read") {
+                        return kendo.stringify(options);
+                    }
+                }
+            },
+            pageSize: 20,
+            schema: {
+                model: {
+                    id: "_id",
+                    fields: {
+                        _id: { editable: false, nullable: true },
+                        start_date: { type: "date", validation: { required: true }},
+                        end_date: { type: "date", validation: { required: true }},
+                        team_id: { field: "team_id", type: "string", validation: { required: true }, defaultValue: teams[0].value },
+                        project_id: { field: "project_id", type: "string", validation: { required: true }, defaultValue: projects[0].value },
+                        planned_points: { type: "number", validation: { required: true }},
+                        actual_points: { type: "number", validation: { required: true }},
+                        non_scored_tasks: { type: "number", validation: { required: true }},
+                        standard_story_points: { type: "number", validation: { required: true }},
+                        research_spike_points: { type: "number", validation: { required: true }},
+                        refactor_points: { type: "number", validation: { required: true }}
+                    }
+                }
+            }
+        });
+
+        $("#sprintGrid").kendoGrid({
+            dataSource: dataSource,
+            pageable: true,
+            selectable: "row",
+            resizable: true,
+            sortable: true,
+            filterable: true,
+            height: 450,
+            toolbar: ["create"],
+            columns: [
+                { field: "start_date", title: "Start Date", width: "100px", template: '#= kendo.toString(start_date, "MM/dd/yyyy") #' },
+                { field: "end_date", title: "End Date", width: "100px", template: '#= kendo.toString(end_date, "MM/dd/yyyy") #' },
+                { field: "team_id", title: "Team", width: "180px", values: teams },
+                { field: "project_id", title: "Project", width: "180px", values: projects },
+                { field: "planned_points", title: "Planned Points", width: "80px"},
+                { field: "actual_points", title: "Actual Points", width: "80px"},
+                { field: "standard_story_points", title: "Story Points", width: "80px"},
+                { field: "research_spike_points", title: "Research Spike Points", width: "100px"},
+                { field: "refactor_points", title: "Refactor Points", width: "80px"},
+                { field: "non_scored_tasks", title: "Non Scored Tasks", width: "100px"},
+                { command: ["edit", "destroy", {name: "Comment", click: showComment}], title: "&nbsp;", width: "250px" }
+            ],
+            editable: "inline",
+            dataBound: function (e) {
+                this.select(e.sender.tbody.find("tr:first"));
+            }
+        });
+    }
+});
+
+</script>
 
 </head>
 <body>
@@ -217,10 +232,13 @@
         <textarea id="sprintComment" name="sprintComment" style="width:250px; height: 220px;" placeholder="Sprint comments..."></textarea>
 
         <div>
-            <button id="btnSaveComment" class="btn btn-default">
+            <button id="btnAddComment" class="btn btn-default">
+                <span class="glyphicon glyphicon-align-left glyphicon-plus-sign">Add</span>
+            </button>
+            <button id="btnCancelComment" class="btn btn-default pull-right">Cancel</button>
+            <button id="btnSaveComment" class="btn btn-default pull-right">
                 <span class="glyphicon glyphicon-align-left glyphicon-floppy-save">Save</span>
             </button>
-            <button id="btnCancelComment" class="btn btn-default">Cancel</button>
         </div>
     </div>
 </div>
