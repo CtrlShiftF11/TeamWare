@@ -5,7 +5,7 @@
 <head>
     <script>
         $(document).ready(function () {
-            var baseUrl = "/teams/";
+            var baseUrl = "/users/";
 
             var dataSource = new kendo.data.DataSource({
                 transport: {
@@ -55,7 +55,7 @@
                 }
             });
 
-            $("#teamGrid").kendoGrid({
+            $("#userGrid").kendoGrid({
                 dataSource: dataSource,
                 pageable: true,
                 selectable: "row",
@@ -73,7 +73,7 @@
 </head>
 <body>
 
-<div id="teamGrid"></div>
+<div id="userGrid"></div>
 
 </body>
 </html>

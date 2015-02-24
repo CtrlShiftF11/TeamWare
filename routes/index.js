@@ -18,6 +18,10 @@ router.get('/views/about', function (req, res) {
     res.render('about', { title: 'TeamWare | Home' });
 });
 
+router.get('/views/users', function (req, res) {
+    res.render('users', { title: 'TeamWare | Users' });
+});
+
 router.get('/views/projects', function (req, res) {
     res.render('projects', {title: 'TeamWare | Projects' });
 });

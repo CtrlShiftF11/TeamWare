@@ -10,6 +10,7 @@ var routes = require('./routes/index');
 var projects = require('./routes/projects');
 var teams = require('./routes/teams');
 var sprints = require('./routes/sprints');
+var users = require('./routes/users');
 
 var app = express();
 
@@ -47,11 +48,13 @@ app.use('/views/sprints', sprints);
 app.use('/views/sprintsbyteam', sprints);
 app.use('/views/actualvsplannedbyteam', sprints);
 app.use('/views/actualvsplannedbyproject', sprints);
+app.use('/views/users', users);
 
 //API Routes
 app.use('/projects', projects);
 app.use('/teams', teams);
 app.use('/sprints', sprints);
+app.use('/users', users);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
