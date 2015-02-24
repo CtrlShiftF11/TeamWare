@@ -60,11 +60,13 @@ $(document).ready(function () {
                             this.select(e.sender.tbody.find("tr:first"));
                             var grid = e.sender;
                             var row = grid.dataItem(this.select());
+                            window.selectedSprintCommentId = row._id;
                             setCommentCard(row);
                         },
                         change: function (e) {
                             var grid = e.sender;
                             var row = grid.dataItem(this.select());
+                            window.selectedSprintCommentId = row._id;
                             setCommentCard(row);
                         },
                         columns: [
@@ -82,6 +84,7 @@ $(document).ready(function () {
         $("#sprintComment").val(gridRow.comment_text);
     }
 
+    //Add new sprint comment
     $("#btnSaveComment").on('click', function (e) {
         if (($("#userList").val() == '') || ($("#sprintComment").val() == '')) {
             alert('Please select a commenter and enter a comment.');
@@ -94,8 +97,15 @@ $(document).ready(function () {
                 comment_text: $("#sprintComment").val()
             }
         };
+        if (window.selectedSprintCommentId == 0) {
+            var route = "/sprints/" + sprint._id + "/addcomment";
+        }
+        else {
+            var route = "/sprints/" + sprint._id + "/updatecomment";
+            sprint.comments._id = window.selectedSprintCommentId;
+        }
         $.ajax({
-            url: "/sprints/" + sprint._id + "/addcomment",
+            url: route,
             type: "PUT",
             dataType: "json",
             data: kendo.stringify(sprint),
@@ -109,6 +119,7 @@ $(document).ready(function () {
                 })
                 .always(function () {
                     window.selectedSprintId = null;
+                    window.selectedSprintCommentId = null;
                 });
     });
 
@@ -118,6 +129,7 @@ $(document).ready(function () {
     });
 
     $("#btnAddComment").on('click', function (e) {
+        window.selectedSprintCommentId = 0;
         var userDropDownList = $("#userList").data("kendoDropDownList");
         userDropDownList.value("");
         $("#userList").focus();

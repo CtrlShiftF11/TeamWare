@@ -111,6 +111,25 @@ router.put('/:id/addcomment', function (req, res, next) {
         });
 });
 
+//Update Comment
+router.put('/:id/updatecomment', function (req, res, next) {
+    Sprint.update({_id: req.params.id, "comments._id": req.body.comments._id},
+        {
+            $set: {
+                "comments.$.user_name": req.body.comments.user_name,
+                "comments.$.comment_text": req.body.comments.comment_text
+            }
+        },
+        function (err, post) {
+            if (err) {
+                return next(err);
+            }
+            else {
+                res.json(post);
+            }
+        });
+});
+
 //Delete by Id
 router.delete('/:id', function (req, res, next) {
     Sprint.findByIdAndRemove(req.params.id, req.body, function (err, post) {
