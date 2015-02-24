@@ -60,8 +60,13 @@ $(document).ready(function () {
                             this.select(e.sender.tbody.find("tr:first"));
                             var grid = e.sender;
                             var row = grid.dataItem(this.select());
-                            window.selectedSprintCommentId = row._id;
-                            setCommentCard(row);
+                            if (row != null) {
+                                window.selectedSprintCommentId = row._id;
+                                setCommentCard(row);
+                            }
+                            else {
+                                setToAddMode();
+                            }
                         },
                         change: function (e) {
                             var grid = e.sender;
@@ -138,10 +143,14 @@ $(document).ready(function () {
     });
 
     $("#btnAddComment").on('click', function (e) {
+        setToAddMode();
+    });
+
+    function setToAddMode() {
         window.selectedSprintCommentId = 0;
         resetCommentCard();
         $("#userList").focus();
-    });
+    }
 
     function loadSprintGrid(teams, projects) {
         var baseUrl = "/sprints/";
