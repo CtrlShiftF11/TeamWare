@@ -84,6 +84,12 @@ $(document).ready(function () {
         $("#sprintComment").val(gridRow.comment_text);
     }
 
+    function resetCommentCard() {
+        var userDropDownList = $("#userList").data("kendoDropDownList");
+        userDropDownList.value("");
+        $("#sprintComment").val("");
+    }
+
     //Add new sprint comment
     $("#btnSaveComment").on('click', function (e) {
         if (($("#userList").val() == '') || ($("#sprintComment").val() == '')) {
@@ -113,6 +119,7 @@ $(document).ready(function () {
         })
                 .done(function (res) {
                     sprintCommentWin.close();
+                    resetCommentCard();
                 })
                 .fail(function () {
                     alert('Unable to save sprint comment.');
@@ -120,20 +127,20 @@ $(document).ready(function () {
                 .always(function () {
                     window.selectedSprintId = null;
                     window.selectedSprintCommentId = null;
+
                 });
     });
 
     $("#btnCancelComment").on('click', function (e) {
         window.selectedSprintId = null;
+        resetCommentCard();
         sprintCommentWin.close();
     });
 
     $("#btnAddComment").on('click', function (e) {
         window.selectedSprintCommentId = 0;
-        var userDropDownList = $("#userList").data("kendoDropDownList");
-        userDropDownList.value("");
+        resetCommentCard();
         $("#userList").focus();
-        $("#sprintComment").val("");
     });
 
     function loadSprintGrid(teams, projects) {
