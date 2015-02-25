@@ -2,6 +2,7 @@
 var mongoose = require('mongoose');
 
 var SprintCommentSchema = new mongoose.Schema({
+    user_id: mongoose.Schema.Types.ObjectId,
     user_name: String,
     comment_text: String,
     last_modified_date: { type: Date, default: Date.now }

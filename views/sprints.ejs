@@ -24,10 +24,19 @@ $(document).ready(function () {
                 loadSprintGrid(teams, projects);
             });
 
-    //Sprint Comment User List - NOTE: This is prototype code that I'll replace with a dynamic db driven list at a later date...
-    var userList = ['', 'Andy Sandefer', 'Brian Thayer', 'Bryan Everly', 'Chris Lenzo', 'Jennifer Davis', 'Roy Stecker', 'Tamara Schultz'];
     $("#userList").kendoDropDownList({
-        dataSource: userList
+        dataTextField: "name",
+        dataValueField: "_id",
+        dataSource: {
+            transport: {
+                read: {
+                    url: "/users/",
+                    dataType: "json",
+                    type: "GET",
+                    contentType: "application/json"
+                }
+            }
+        }
     });
 
     function showComment(e) {
