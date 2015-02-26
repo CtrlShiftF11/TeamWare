@@ -110,10 +110,12 @@ $(document).ready(function () {
             alert('Please select a commenter and enter a comment.');
             return false;
         }
+        var userDropDownList = $("#userList").data("kendoDropDownList");
         var sprint = {
             _id: window.selectedSprintId,
             comments: {
-                user_name: $("#userList").val(),
+                user_id: userDropDownList.select(),
+                user_name: userDropDownList.text(),
                 comment_text: $("#sprintComment").val()
             }
         };

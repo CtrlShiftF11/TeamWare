@@ -96,6 +96,7 @@ router.put('/:id/addcomment', function (req, res, next) {
         {
             $push: {
                 comments: {
+                    user_id: req.body.comments._user_id,
                     user_name: req.body.comments.user_name,
                     comment_text: req.body.comments.comment_text
                 }
@@ -116,6 +117,7 @@ router.put('/:id/updatecomment', function (req, res, next) {
     Sprint.update({_id: req.params.id, "comments._id": req.body.comments._id},
         {
             $set: {
+                "comments.$.user_id": req.body.comments._user_id,
                 "comments.$.user_name": req.body.comments.user_name,
                 "comments.$.comment_text": req.body.comments.comment_text
             }
