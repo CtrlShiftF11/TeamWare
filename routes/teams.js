@@ -17,6 +17,26 @@ router.get('/', function (req, res, next) {
     });
 });
 
+router.get('/getdistbyteam/', function (req, res, next) {
+    var query = Team.aggregate([
+        {
+            $group: {
+                _id: '$state_code',
+                totalTeams: { $sum: 1 }
+            }
+        }
+    ]);
+
+    query.exec(function (err, post) {
+        if (err) {
+            return next(err);
+        }
+        else {
+            res.json(post);
+        }
+    });
+});
+
 //Get by Id
 router.get('/:id', function (req, res, next) {
     Team.findById(req.params.id, function (err, post) {
@@ -63,6 +83,6 @@ router.delete('/:id', function (req, res, next) {
             res.json(post);
         }
     });
-})
+});
 
 module.exports = router;

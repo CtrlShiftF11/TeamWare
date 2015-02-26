@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<%= include partials/navmenu %>
+<head>
+
+    <script src="http://code.highcharts.com/maps/highmaps.js"></script>
+    <script src="http://code.highcharts.com/maps/modules/data.js"></script>
+    <script src="http://code.highcharts.com/mapdata/countries/us/us-all.js"></script>
+    <div id="mapContainer" style="height: 500px; min-width: 310px; max-width: 600px; margin: 0 auto"></div>
+
+    <script>
+        $(function () {
+
+            $.getJSON('/teams/getdistbyteam')
+                    .done(function (data) {
+
+                        $('#mapContainer').highcharts('Map', {
+
+                            chart: {
+                                borderWidth: 1
+                            },
+
+                            title: {
+                                text: 'Software Team Distribution by State'
+                            },
+
+                            legend: {
+                                layout: 'horizontal',
+                                borderWidth: 0,
+                                backgroundColor: 'rgba(255,255,128,0.85)',
+                                floating: true,
+                                verticalAlign: 'top',
+                                y: 25
+                            },
+
+                            mapNavigation: {
+                                enabled: true
+                            },
+
+                            colorAxis: {
+                                min: 1,
+                                type: 'logarithmic',
+                                minColor: '#EEEEFF',
+                                maxColor: '#000022',
+                                stops: [
+                                    [0, '#EFEFFF'],
+                                    [0.67, '#4444FF'],
+                                    [1, '#000022']
+                                ]
+                            },
+
+                            series: [
+                                {
+                                    animation: {
+                                        duration: 1000
+                                    },
+                                    data: data,
+                                    mapData: Highcharts.maps['countries/us/us-all'],
+                                    joinBy: ['postal-code', '_id'],
+                                    dataLabels: {
+                                        enabled: true,
+                                        color: 'white',
+                                        format: '{point._id}'
+                                    },
+                                    name: 'Software Team Distribution by State',
+                                    tooltip: {
+                                        pointFormat: '{point._id}: {point.totalTeams}'
+                                    }
+                                }
+                            ]
+                        });
+                    });
+        });
+    </script>
+</head>
+<body>
+<div id="mapContainer"></div>
+</body>
+</html>

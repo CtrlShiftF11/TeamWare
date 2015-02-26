@@ -44,6 +44,7 @@ app.use('/', routes);
 app.use('/views/about', routes);
 app.use('/views/projects', routes);
 app.use('/views/teams', teams);
+app.use('/views/teamdistributionbystate', teams);
 app.use('/views/sprints', sprints);
 app.use('/views/sprintsbyteam', sprints);
 app.use('/views/actualvsplannedbyteam', sprints);

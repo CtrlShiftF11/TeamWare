@@ -46,4 +46,7 @@ router.get('/views/actualvsplannedbyproject', function (req, res) {
     res.render('actualvsplannedbyproject', {title: 'TeamWare'});
 });
 
+router.get('/views/teamdistributionbystate', function (req, res) {
+    res.render('teamdistributionbystate', {title: 'TeamWare'});
+});
 module.exports = router;

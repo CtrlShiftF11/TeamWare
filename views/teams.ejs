@@ -49,7 +49,8 @@
                         id: "_id",
                         fields: {
                             _id: { editable: false, nullable: true },
-                            name: { validation: { required: true } }
+                            name: { validation: { required: true } },
+                            state_code: { validation: {required: true } }
                         }
                     }
                 }
@@ -63,6 +64,7 @@
                 toolbar: ["create"],
                 columns: [
                     { field: "name", title: "Name", width: "180px" },
+                    { field: "state_code", title: "State", width: "120px"},
                     { command: ["edit", "destroy"], title: "&nbsp;", width: "250px" }
                 ],
                 editable: "inline"
