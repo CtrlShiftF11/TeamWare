@@ -3,10 +3,16 @@
 <%= include partials/navmenu %>
 <head>
 
-    <script src="http://code.highcharts.com/maps/highmaps.js"></script>
-    <script src="http://code.highcharts.com/maps/modules/data.js"></script>
-    <script src="http://code.highcharts.com/mapdata/countries/us/us-all.js"></script>
-    <div id="mapContainer" style="height: 500px; min-width: 310px; max-width: 600px; margin: 0 auto"></div>
+    <!--<script src="http://code.highcharts.com/maps/highmaps.js"></script>-->
+    <!--<script src="http://code.highcharts.com/maps/modules/data.js"></script>-->
+    <!--<script src="http://code.highcharts.com/mapdata/countries/us/us-all.js"></script>-->
+
+    <script src="/javascripts/highmaps.js"></script>
+    <script src="/javascripts/data.js"></script>
+    <script src="/javascripts/us-all.js"></script>
+
+
+    <div id="mapContainer" style="height: 600px; min-width: 510px; max-width: 800px; margin: 0 auto"></div>
 
     <script>
         $(function () {
@@ -55,7 +61,7 @@
                                         duration: 1000
                                     },
                                     data: data,
-                                    mapData: Highcharts.maps['countries/us/us-all'],
+                                    mapData: Highcharts.maps['us-all'],
                                     joinBy: ['postal-code', '_id'],
                                     dataLabels: {
                                         enabled: true,
