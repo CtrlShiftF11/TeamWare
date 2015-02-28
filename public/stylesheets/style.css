@@ -30,3 +30,10 @@ a {
 .k-grid .k-grid-header .k-header {
     white-space: normal;
 }
+
+.reportPanel {
+    width: 300px;
+    float: left;
+    margin-right: 10px;
+    min-height: 280px;
+}

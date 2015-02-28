@@ -2,14 +2,75 @@
 <!DOCTYPE html>
 <html>
 <%= include partials/navmenu %>
+
+<head>
+    <script>
+        $(document).ready(function () {
+            $("#reportFilter").on('keyup', function (e) {
+                if (e.keyCode == 27 || $(this).val() == '') {
+                    //Test for Esc key - if pressed then clear all Filters...
+                    $(this).val('');
+                    $(".reportPanel").removeClass('visible').show().addClass('visible');
+                }
+                else {
+                    filterList('.reportPanel', $(this).val());
+                }
+            });
+        });
+
+        function filterList(selector, query) {
+            query = $.trim(query);
+            query = query.replace(/ /gi, '|');
+            $(selector).each(function () {
+                ($(this).text().search(new RegExp(query, "i")) < 0) ? $(this).hide().removeClass('visible') : $(this).show().addClass('visible');
+            });
+        }
+
+    </script>
+
+</head>
 <body>
 
-<ul>
-    <li><a href="/views/sprintsbyteam">Sprint Work Composition by Team</a></li>
-    <li><a href="/views/actualvsplannedbyteam">Actual vs Planned by Team</a></li>
-    <li><a href="/views/actualvsplannedbyproject">Actual vs Planned by Project</a></li>
-    <li><a href="/views/teamdistributionbystate">Team Distribution by State</a></li>
-</ul>
+<div id="reportFilterCont" style="margin-bottom: 20px;">
+    <label for="reportFilter">Report Filter</label>
+    <input id="reportFilter" type="text" placeholder="Search">
+    <button class="btn btn-default">Reset</button>
+</div>
+<div style="clear:both;"/>
+
+<div class="panel panel-default reportPanel">
+    <div class="panel-heading">Sprint Work Composition by Team</div>
+    <div class="panel-body">
+        Get a comprehensive view of the types of work that a team performed over an extended period of time.
+        <a href="/views/sprintsbyteam" class="btn btn-default center-block">View</a>
+    </div>
+</div>
+
+<div class="panel panel-default reportPanel">
+    <div class="panel-heading">Actual vs Planned by Team</div>
+    <div class="panel-body">
+        Analyze what a team planned against what was actually accomplished.
+        <a href="/views/actualvsplannedbyteam" class="btn btn-default center-block">View</a>
+    </div>
+</div>
+
+<div class="panel panel-default reportPanel">
+    <div class="panel-heading">Actual vs Planned by Project</div>
+    <div class="panel-body">
+        Contrast planned story points against actual story points for an entire project.
+        <a href="/views/actualvsplannedbyproject" class="btn btn-default center-block">View</a>
+    </div>
+</div>
+
+<div class="panel panel-default reportPanel">
+    <div class="panel-heading">Team Distribution by State</div>
+    <div class="panel-body">
+        View a distribution map of the United States that highlights exactly where our development resources are located.
+        <a href="/views/teamdistributionbystate" class="btn btn-default center-block">View</a>
+    </div>
+</div>
+<div style="clear: both;"/>
+<p style="font-weight: bold;">Pardon my dust - I will be replacing the "View" buttons with actual icons but for now I need a way to launch a report!</p>
 
 </body>
 </html>
