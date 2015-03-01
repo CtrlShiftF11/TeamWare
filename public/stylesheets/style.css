@@ -37,3 +37,7 @@ a {
     margin-right: 10px;
     min-height: 280px;
 }
+
+form label {
+    min-width: 120px;
+}
