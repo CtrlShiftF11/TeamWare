@@ -1,6 +1,6 @@
 web:
   build: .
-  command: ./bin/www
+  command: nodemon ./bin/www
   ports:
    - "3000:3000"
   volumes:
