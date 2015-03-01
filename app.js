@@ -20,7 +20,11 @@ app.set('view engine', 'ejs');
 
 // mongoose connector...
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/teamware', function (err) {
+
+// I'd like to have this hostname passed in through ENV var
+//   Currently though 'mongodb' is the name of one of the Docker
+//   containers running through docker-compose
+mongoose.connect('mongodb://mongodb/teamware', function (err) {
     if (err) {
         console.log('connection error', err);
     }

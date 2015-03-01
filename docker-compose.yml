@@ -1,0 +1,11 @@
+web:
+  build: .
+  command: ./bin/www
+  ports:
+   - "3000:3000"
+  volumes:
+   - .:/app
+  links:
+   - mongodb
+mongodb:
+  image: dockerfile/mongodb
