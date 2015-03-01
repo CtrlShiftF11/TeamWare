@@ -7,6 +7,76 @@
         $(document).ready(function () {
             var baseUrl = "/users/";
 
+            $("#btnSave").on('click', function () {
+                saveUser();
+            });
+
+            function saveUser() {
+                var user = {
+                    name: $("#name").val()
+                };
+                var restUrl = baseUrl;
+                var restAction = "POST";
+                if (window.selectedUserId != null && typeof window.selectedUserId != 'undefined') {
+                    restUrl += window.selectedUserId;
+                    restAction = "PUT";
+                }
+                $.ajax({
+                    url: restUrl,
+                    type: restAction,
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: JSON.stringify(user)
+                })
+                        .done(function (result) {
+                            $("#editUserWin").modal('hide');
+                            reloadGrid();
+                        })
+                        .fail(function () {
+                            alert('Unable to save user');
+                        })
+                        .always(function () {
+                            window.selectedUserId = null;
+                        });
+            }
+
+            function editUser(e) {
+                var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+                window.selectedUserId = dataItem._id;
+                $("#name").val(dataItem.name);
+                $("#editUserWin").modal('show');
+            }
+
+            function confirmDeleteUser(e) {
+                var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+                window.selectedUserId = dataItem._id;
+                $("#deleteUserWin").modal('show');
+            }
+
+            $("#btnDeleteUser").on('click', function () {
+                deleteUser();
+            });
+
+            function deleteUser() {
+                $.ajax({
+                    url: baseUrl + window.selectedUserId,
+                    type: "DELETE",
+                    contentType: "application/json",
+                    dataType: "json"
+                })
+                        .done(function (result) {
+                            $("#deleteUserWin").modal('hide');
+                        })
+                        .fail(function () {
+                            alert('Unable to delete user');
+                        })
+                        .always(function () {
+                            window.selectedUserId = null;
+                            reloadGrid();
+                        });
+            }
+
+            //DataSource
             var dataSource = new kendo.data.DataSource({
                 transport: {
                     read: {
@@ -14,33 +84,6 @@
                         dataType: "json",
                         type: "GET",
                         contentType: "application/json"
-                    },
-                    update: {
-                        url: function (e) {
-                            return baseUrl + e._id;
-                        },
-                        dataType: "json",
-                        type: "PUT",
-                        contentType: "application/json"
-                    },
-                    destroy: {
-                        url: function (e) {
-                            return baseUrl + e._id;
-                        },
-                        dataType: "json",
-                        type: "DELETE",
-                        contentType: "application/json"
-                    },
-                    create: {
-                        url: baseUrl,
-                        dataType: "json",
-                        type: "POST",
-                        contentType: "application/json"
-                    },
-                    parameterMap: function (options, operation) {
-                        if (operation !== "read") {
-                            return kendo.stringify(options);
-                        }
                     }
                 },
                 pageSize: 20,
@@ -55,25 +98,110 @@
                 }
             });
 
+            //Grid
             $("#userGrid").kendoGrid({
                 dataSource: dataSource,
-                pageable: true,
-                selectable: "row",
                 height: 450,
-                toolbar: ["create"],
+                toolbar: kendo.template($("#gridTemplate").html()),
                 columns: [
                     { field: "name", title: "Name", width: "180px" },
-                    { command: ["edit", "destroy"], title: "&nbsp;", width: "250px" }
+                    { command: [
+                        { name: "Edit", click: editUser },
+                        { name: "Delete", click: confirmDeleteUser }
+                    ],
+                        title: "&nbsp;", width: "160px"
+                    }
                 ],
-                editable: "inline"
+                pageable: true,
+                selectable: "row",
+                resizable: true,
+                sortable: true,
+                filterable: true,
+                dataBound: function (e) {
+                    //This event needs to be delegated and wired after the grid is dataBound because
+                    //the Add button is part of the grid's toolbar and doesn't exist during the
+                    //document's onReady event!
+                    $("#btnAdd").on('click', function (e) {
+                        clearDialogFields();
+                        window.selectedUserId = null;
+                        $("#editUserWin").modal('show');
+                    });
+
+                    this.select(e.sender.tbody.find("tr:first"));
+                    var grid = e.sender;
+                    var row = grid.dataItem(this.select());
+                },
+                change: function (e) {
+                    var grid = e.sender;
+                    var row = grid.dataItem(this.select());
+                    window.selectedUserId = row._id;
+                }
             });
+
+            function reloadGrid() {
+                var grid = $("#userGrid").data("kendoGrid");
+                grid.dataSource.read();
+            }
+
+            function clearDialogFields() {
+                $("#name").val('');
+            }
         });
     </script>
 
+    <script type="text/x-kendo-template" id="gridTemplate">
+        <button type="button" id="btnAdd" data-toggle="modal">Add User</button>
+    </script>
 </head>
 <body>
 
-<div id="userGrid"></div>
+<div id="userGrid" style="width:420px; float: left; margin-right: 10px;"></div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editUserWin" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Edit User</h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <label for="name">User Name</label>
+                    <input id="name" type="text" maxlength="100">
+                    <br/>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="btnCancelEdit" class="btn btn-default pull-right" data-dismiss="modal">Cancel</button>
+                <button id="btnSave" class="btn btn-default pull-right">
+                    <span class="glyphicon glyphicon-align-left glyphicon-floppy-save">Save</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete User -->
+<div class="modal modal fade" id="deleteUserWin" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Delete User</h4>
+            </div>
+            <div class="modal-body">
+                Are you sure you that you want to delete the selected user?
+            </div>
+            <div class="modal-footer">
+                <button id="btnCancelDelete" class="btn btn-default pull-right" data-dismiss="modal">Cancel</button>
+                <button id="btnDeleteUser" class="btn btn-default pull-right">
+                    <span class="glyphicon glyphicon-remove">&nbsp;Delete</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

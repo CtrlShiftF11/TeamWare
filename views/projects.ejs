@@ -46,7 +46,6 @@
                 var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
                 window.selectedProjectId = dataItem._id;
                 $("#name").val(dataItem.name);
-                $("#state_code").val(dataItem.state_code);
                 $("#editProjectWin").modal('show');
             }
 
@@ -175,8 +174,6 @@
                     <label for="name">Project Name</label>
                     <input id="name" type="text" maxlength="100">
                     <br/>
-                    <label for="state_code">State</label>
-                    <input id="state_code" type="text" maxlength="2">
                 </form>
             </div>
             <div class="modal-footer">
