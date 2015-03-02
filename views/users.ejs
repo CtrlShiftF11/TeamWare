@@ -146,6 +146,28 @@
             function clearDialogFields() {
                 $("#name").val('');
             }
+
+            function getUserPhoto() {
+                var userImg = $('<img src="/uploads/user"' + window.selectedUserId + '"/>');
+                $("#userPhotoCont").empty().append(userImg);
+            }
+
+            function setUserPhotoFilename() {
+                $.ajax({
+                    url: "/setuserphotofilename",
+                    type: "POST",
+                    dataType: "json",
+                    contentType: "application/json",
+                    data: JSON.stringify(window.selectedUserId)
+                })
+                        .done(function (data) {
+                            alert('got it!' + data);
+                        })
+                        .fail(function (data) {
+                            alert('Unable to process file upload at this time');
+                        });
+            }
+
         });
     </script>
 
@@ -156,6 +178,7 @@
 <body>
 
 <div id="userGrid" style="width:420px; float: left; margin-right: 10px;"></div>
+<div id="userPhotoCont" style="float:left;"></div>
 
 <!-- Edit Modal -->
 <div class="modal fade" id="editUserWin" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
