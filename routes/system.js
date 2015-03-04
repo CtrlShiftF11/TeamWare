@@ -67,6 +67,73 @@ router.post('/resetmongodb', function (req, res, next) {
     ];
     Project.collection.insert(projects, onInsert);
 
+    var teams = [
+        {
+            "_id": "54f690fd80b4fa1800194221",
+            "name": "Autobots",
+            "state_code": "IN",
+            "__v": 0,
+            "last_modified_date": "2015-03-04T04:58:37.683Z"
+        },
+        {
+            "_id": "54f6910b80b4fa1800194222",
+            "name": "Honey Badgers",
+            "state_code": "IN",
+            "__v": 0,
+            "last_modified_date": "2015-03-04T04:58:51.799Z"
+        },
+        {
+            "_id": "54f6911680b4fa1800194223",
+            "name": "Scrum Team Six",
+            "state_code": "IN",
+            "__v": 0,
+            "last_modified_date": "2015-03-04T04:59:02.328Z"
+        },
+        {
+            "_id": "54f6912380b4fa1800194224",
+            "name": "Clown Committee",
+            "state_code": "IN",
+            "__v": 0,
+            "last_modified_date": "2015-03-04T04:59:15.288Z"
+        },
+        {
+            "_id": "54f6912b80b4fa1800194225",
+            "name": "Alpha Team",
+            "state_code": "IN",
+            "__v": 0,
+            "last_modified_date": "2015-03-04T04:59:23.917Z"
+        },
+        {
+            "_id": "54f6913b80b4fa1800194226",
+            "name": "X-MEN",
+            "state_code": "IN",
+            "__v": 0,
+            "last_modified_date": "2015-03-04T04:59:39.767Z"
+        },
+        {
+            "_id": "54f6914380b4fa1800194227",
+            "name": "Terminators",
+            "state_code": "IN",
+            "__v": 0,
+            "last_modified_date": "2015-03-04T04:59:47.745Z"
+        },
+        {
+            "_id": "54f6915280b4fa1800194228",
+            "name": "Technobots",
+            "state_code": "IN",
+            "__v": 0,
+            "last_modified_date": "2015-03-04T05:00:02.235Z"
+        },
+        {
+            "_id": "54f6916380b4fa1800194229",
+            "name": "Vegas",
+            "state_code": "IN",
+            "__v": 0,
+            "last_modified_date": "2015-03-04T05:00:19.367Z"
+        }
+    ];
+    Team.collection.insert(teams, onInsert);
+
     res.json({'jobStatus': 'MongoDB Refresh Complete - It\'s All Good!'});
 });
 
