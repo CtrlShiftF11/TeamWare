@@ -40,6 +40,7 @@ A complete list of docker-machine commands can be viewed by entering
 docker-machine --help
 ```
 They are listed below for convenience...
+```bash
    active	Get or set the active machine
    create	Create a machine
    config	Print the connection config for machine
@@ -56,7 +57,7 @@ They are listed below for convenience...
    upgrade	Upgrade a machine to the latest version of Docker
    url		Get the URL of a machine
    help, h	Shows a list of commands or help for one command
-
+```
 # Resolving Issues   
 If you encounter difficulties running a previously created virtual environment you can kill, remove and rebuild but
 please keep in mind that any data that you've entered into the MongoDB demo database will be lost.  Destroying the
