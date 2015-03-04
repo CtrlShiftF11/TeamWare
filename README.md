@@ -34,5 +34,53 @@ chmod +x /usr/local/bin/docker-compose
 open http://$(docker-machine ip):3000/
 ```
 
+# Docker-Machine Help
+A complete list of docker-machine commands can be viewed by entering
+```bash
+docker-machine --help
+```
+They are listed below for convenience...
+   active	Get or set the active machine
+   create	Create a machine
+   config	Print the connection config for machine
+   inspect	Inspect information about a machine
+   ip		Get the IP address of a machine
+   kill		Kill a machine
+   ls		List machines
+   restart	Restart a machine
+   rm		Remove a machine
+   env		Display the commands to set up the environment for the Docker client
+   ssh		Log into or run a command on a machine with SSH
+   start	Start a machine
+   stop		Stop a machine
+   upgrade	Upgrade a machine to the latest version of Docker
+   url		Get the URL of a machine
+   help, h	Shows a list of commands or help for one command
+
+# Resolving Issues   
+If you encounter difficulties running a previously created virtual environment you can kill, remove and rebuild but
+please keep in mind that any data that you've entered into the MongoDB demo database will be lost.  Destroying the
+environment and rebuilding it may take a significant amount of time due to download processes!
+
+Kill the virtual environment...
+```bash
+docker-machine kill teamware-dev
+```
+Destroy the virtual environment...
+```bash
+docker-machine rm teamware-dev
+```
+Rebuild the virtual environment from scratch...
+```bash
+./start
+```
+
+If you need to figure out where an existing environment is running simply enter...
+```bash
+docker-machine ip
+```
+Remember to append port 3000 to whatever address the docker machine is running at to view it in your browser. 
+
+
 # Deploying
 Additional deployment documentation will be added as I get closer to releasing a beta version of this freeware.
