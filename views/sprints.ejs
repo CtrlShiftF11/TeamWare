@@ -2,8 +2,15 @@
 <html>
 <%= include partials/navmenu %>
 <head>
+<style>
+    form label {
+        min-width: 180px;
+    }
+</style>
 <script>
 $(document).ready(function () {
+    var baseUrl = "/sprints/";
+
     //Get Teams and Projects for grid drop down lists...
     $.when($.getJSON('/teams'), $.getJSON('/projects'))
             .done(function (teamData, projectData) {
@@ -22,8 +29,11 @@ $(document).ready(function () {
                     projects.push(project);
                 }
                 loadSprintGrid(teams, projects);
+                loadProjectDropDownList();
+                loadTeamDropDownList();
             });
 
+    //Users Drop Down List for Comments Dialog
     $("#userList").kendoDropDownList({
         dataTextField: "name",
         dataValueField: "_id",
@@ -39,6 +49,45 @@ $(document).ready(function () {
         }
     });
 
+    //Projects Drop Down List for Sprint Dialog
+    function loadProjectDropDownList() {
+        $("#projectList").kendoDropDownList({
+            dataTextField: "name",
+            dataValueField: "_id",
+            dataSource: {
+                transport: {
+                    read: {
+                        url: "/projects/",
+                        dataType: "json",
+                        type: "GET",
+                        contentType: "application/json"
+                    }
+                }
+            }
+        });
+    }
+
+    //Teams Drop Down List for Sprint Dialog
+    function loadTeamDropDownList() {
+        $("#teamList").kendoDropDownList({
+            dataTextField: "name",
+            dataValueField: "_id",
+            dataSource: {
+                transport: {
+                    read: {
+                        url: "/teams/",
+                        dataType: "json",
+                        type: "GET",
+                        contentType: "application/json"
+                    }
+                }
+            }
+        });
+    }
+
+    $(".datepicker").kendoDatePicker();
+
+    //Comment Dialog Grid
     function showComment(e) {
         sprintCommentWin = $("#sprintCommentDialog")
                 .kendoWindow({
@@ -163,8 +212,9 @@ $(document).ready(function () {
         $("#userList").focus();
     }
 
+
+    //Sprint Grid DataSource
     function loadSprintGrid(teams, projects) {
-        var baseUrl = "/sprints/";
         var dataSource = new kendo.data.DataSource({
             transport: {
                 read: {
@@ -172,33 +222,6 @@ $(document).ready(function () {
                     dataType: "json",
                     type: "GET",
                     contentType: "application/json"
-                },
-                update: {
-                    url: function (e) {
-                        return baseUrl + e._id;
-                    },
-                    dataType: "json",
-                    type: "PUT",
-                    contentType: "application/json"
-                },
-                destroy: {
-                    url: function (e) {
-                        return baseUrl + e._id;
-                    },
-                    dataType: "json",
-                    type: "DELETE",
-                    contentType: "application/json"
-                },
-                create: {
-                    url: baseUrl,
-                    dataType: "json",
-                    type: "POST",
-                    contentType: "application/json"
-                },
-                parameterMap: function (options, operation) {
-                    if (operation !== "read") {
-                        return kendo.stringify(options);
-                    }
                 }
             },
             pageSize: 20,
@@ -223,39 +246,184 @@ $(document).ready(function () {
         });
 
         $("#sprintGrid").kendoGrid({
-            dataSource: dataSource,
-            pageable: true,
-            selectable: "row",
-            resizable: true,
-            sortable: true,
-            filterable: true,
-            height: 450,
-            toolbar: ["create"],
-            columns: [
-                { field: "start_date", title: "Start Date", width: "100px", template: '#= kendo.toString(start_date, "MM/dd/yyyy") #' },
-                { field: "end_date", title: "End Date", width: "100px", template: '#= kendo.toString(end_date, "MM/dd/yyyy") #' },
-                { field: "team_id", title: "Team", width: "180px", values: teams },
-                { field: "project_id", title: "Project", width: "180px", values: projects },
-                { field: "planned_points", title: "Planned Points", width: "80px"},
-                { field: "actual_points", title: "Actual Points", width: "80px"},
-                { field: "standard_story_points", title: "Story Points", width: "80px"},
-                { field: "research_spike_points", title: "Research Spike Points", width: "100px"},
-                { field: "refactor_points", title: "Refactor Points", width: "80px"},
-                { field: "non_scored_tasks", title: "Non Scored Tasks", width: "100px"},
-                { command: ["edit", "destroy", {name: "Comment", click: showComment}], title: "&nbsp;", width: "250px" }
-            ],
-            editable: "inline",
-            dataBound: function (e) {
-                this.select(e.sender.tbody.find("tr:first"));
-            }
-        });
-    }
-});
+                    dataSource: dataSource,
+                    pageable: true,
+                    selectable: "row",
+                    resizable: true,
+                    sortable: true,
+                    filterable: true,
+                    height: 450,
+                    toolbar: kendo.template($("#gridTemplate").html()),
+                    columns: [
+                        { field: "start_date", title: "Start Date", width: "100px", template: '#= kendo.toString(start_date, "MM/dd/yyyy") #' },
+                        { field: "end_date", title: "End Date", width: "100px", template: '#= kendo.toString(end_date, "MM/dd/yyyy") #' },
+                        { field: "team_id", title: "Team", width: "180px", values: teams },
+                        { field: "project_id", title: "Project", width: "180px", values: projects },
+                        { field: "planned_points", title: "Planned Points", width: "80px"},
+                        { field: "actual_points", title: "Actual Points", width: "80px"},
+                        { command: [
+                            { name: "Edit", click: editSprint },
+                            { name: "Delete", click: confirmDeleteSprint },
+                            { name: "Comment", click: showComment}
+                        ], title: "&nbsp;", width: "190px" }
+                    ],
+                    dataBound: function (e) {
+                        //This event needs to be delegated and wired after the grid is dataBound because
+                        //the Add button is part of the grid's toolbar and doesn't exist during the
+                        //document's onReady event!
+                        $("#btnAdd").on('click', function (e) {
+                            clearDialogFields();
+                            window.selectedSprintId = null;
+                            $("#editSprintWin").modal('show');
+                        });
 
+                        this.select(e.sender.tbody.find("tr:first"));
+                        var grid = e.sender;
+                        var row = grid.dataItem(this.select());
+                    },
+                    change: function (e) {
+                        var grid = e.sender;
+                        var row = grid.dataItem(this.select());
+                        window.selectedSprintId = row._id;
+                        //getSprintByTeam(row._id);
+                    }
+                }
+        )
+        ;
+    }
+
+    function reloadGrid() {
+        var grid = $("#sprintGrid").data("kendoGrid");
+        grid.dataSource.read();
+    }
+
+    function clearDialogFields() {
+        $("#teamList").val('');
+        $("#projectList").val('');
+        $("#planned_points").val('');
+        $("#actual_points").val('');
+        $("#start_date").val('');
+        $("#end_date").val('');
+        $("#non_scored_tasks").val('');
+        $("#standard_story_points").val('');
+        $("#research_spike_points").val('');
+        $("#refactor_points").val('');
+        $("#new_defects").val('');
+        $("#new_escapes").val('');
+        $("#total_remaining_defects").val('');
+    }
+
+    $("#btnSave").on('click', function () {
+        saveSprint();
+    });
+
+    function saveSprint() {
+        //Kendo DropDownList is exhibiting an unexpected behavior and I had to use the _selectedValue property
+        //instead of the .value() method in order to retrieve the underlying selected value
+        var teamDropDownList = $("#teamList").data("kendoDropDownList");
+        var projectDropDownList = $("#projectList").data("kendoDropDownList");
+        var sprint = {
+            team_id: teamDropDownList._selectedValue,
+            project_id: projectDropDownList._selectedValue,
+            planned_points: $("#planned_points").val(),
+            actual_points: $("#actual_points").val(),
+            start_date: $("#start_date").val(),
+            end_date: $("#end_date").val(),
+            non_scored_points: $("#non_scored_tasks").val(),
+            standard_story_points: $("#standard_story_points").val(),
+            research_spike_points: $("#research_spike_points").val(),
+            refactor_points: $("#refactor_points").val(),
+            new_defects: $("#new_defects").val(),
+            new_escapes: $("#new_escapes").val(),
+            total_remaining_defects: $("#total_remaining_defects").val()
+        };
+        var restUrl = baseUrl;
+        var restAction = "POST";
+        if (window.selectedSprintId != null && typeof window.selectedSprintId != 'undefined') {
+            restUrl += window.selectedSprintId;
+            restAction = "PUT";
+        }
+        $.ajax({
+            url: restUrl,
+            type: restAction,
+            contentType: "application/json",
+            dataType: "json",
+            data: JSON.stringify(sprint)
+        })
+                .done(function (result) {
+                    $("#editSprintWin").modal('hide');
+                    reloadGrid();
+                })
+                .fail(function () {
+                    alert('Unable to save sprint');
+                })
+                .always(function () {
+                    window.selectedSprintId = null;
+                });
+    }
+
+    function editSprint(e) {
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        window.selectedSprintId = dataItem._id;
+        var teamDropDownList = $("#teamList").data("kendoDropDownList");
+        teamDropDownList.value(dataItem.team_id);
+        var projectDropDownList = $("#projectList").data("kendoDropDownList");
+        projectDropDownList.value(dataItem.project_id);
+        $("#planned_points").val(dataItem.planned_points);
+        $("#actual_points").val(dataItem.actual_points);
+        $("#start_date").val(dataItem.start_date);
+        $("#end_date").val(dataItem.end_date);
+        $("#non_scored_tasks").val(dataItem.non_scored_tasks);
+        $("#standard_story_points").val(dataItem.standard_story_points);
+        $("#research_spike_points").val(dataItem.research_spike_points);
+        $("#refactor_points").val(dataItem.refactor_points);
+        $("#new_defects").val(dataItem.new_defects);
+        $("#new_escapes").val(dataItem.new_escapes);
+        $("#total_remaining_defects").val(dataItem.total_remaining_defects);
+        $("#editSprintWin").modal('show');
+    }
+
+    function confirmDeleteSprint(e) {
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        window.selectedSprintId = dataItem._id;
+        $("#deleteSprintWin").modal('show');
+    }
+
+    $("#btnDeleteTeam").on('click', function () {
+        deleteSprint();
+    });
+
+    function deleteSprint() {
+        $.ajax({
+            url: baseUrl + window.selectedSprintId,
+            type: "DELETE",
+            contentType: "application/json",
+            dataType: "json"
+        })
+                .done(function (result) {
+                    $("#deleteSprintWin").modal('hide');
+                })
+                .fail(function () {
+                    alert('Unable to delete sprint');
+                })
+                .always(function () {
+                    window.selectedSprintId = null;
+                    reloadGrid();
+                });
+    }
+
+})
+;
+
+</script>
+
+<script type="text/x-kendo-template" id="gridTemplate">
+    <button id="btnAdd" type="button" data-toggle="modal">Add Sprint</button>
 </script>
 
 </head>
 <body>
+<!-- Todo: This is a Kendo Dialog and should be refactored to a Bootstrap Dialog when time allows... -->
 <div id="sprintCommentDialog" style="display:none;">
     <div class="well pull-left">
         <div id="sprintCommentsGrid" style="width: 450px;"></div>
@@ -278,6 +446,92 @@ $(document).ready(function () {
             <button id="btnSaveComment" class="btn btn-default pull-right">
                 <span class="glyphicon glyphicon-align-left glyphicon-floppy-save">Save</span>
             </button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editSprintWin" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Edit Sprint</h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <label for="teamList">Team</label>
+
+                    <div id="teamList"></div>
+                    <br/>
+                    <label for="projectList">Project</label>
+
+                    <div id="projectList"></div>
+                    <br/>
+                    <label for="planned_points">Planned Points</label>
+                    <input type="number" id="planned_points"/>
+
+                    <br/>
+                    <label for="actual_points">Actual Points</label>
+                    <input type="number" id="actual_points"/>
+
+                    <br/>
+                    <label for="start_date">Start Date</label>
+                    <input id="start_date" class="datepicker"/>
+
+                    <br/>
+                    <label for="end_date">End Date</label>
+                    <input id="end_date" class="datepicker"/>
+
+                    <br/>
+                    <label for="standard_story_points">Standard Story Points</label>
+                    <input type="number" id="standard_story_points"/>
+
+                    <br/>
+                    <label for="research_spike_points">Research Spike Points</label>
+                    <input type="number" id="research_spike_points"/>
+
+                    <br/>
+                    <label for="new_defects">New Defects</label>
+                    <input type="number" id="new_defects"/>
+
+                    <br/>
+                    <label for="new_escapes">New Escapes</label>
+                    <input type="number" id="new_escapes"/>
+
+                    <br/>
+                    <label for="total_remaining_defects">Total Remaining Defects</label>
+                    <input type="number" id="total_remaining_defects"/>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="btnCancelEdit" class="btn btn-default pull-right" data-dismiss="modal">Cancel</button>
+                <button id="btnSave" class="btn btn-default pull-right">
+                    <span class="glyphicon glyphicon-align-left glyphicon-floppy-save">Save</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Sprint -->
+<div class="modal modal fade" id="deleteSprintWin" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Delete Team</h4>
+            </div>
+            <div class="modal-body">
+                Are you sure you that you want to delete the selected sprint?
+            </div>
+            <div class="modal-footer">
+                <button id="btnCancelDelete" class="btn btn-default pull-right" data-dismiss="modal">Cancel</button>
+                <button id="btnDeleteTeam" class="btn btn-default pull-right">
+                    <span class="glyphicon glyphicon-remove">&nbsp;Delete</span>
+                </button>
+            </div>
         </div>
     </div>
 </div>
