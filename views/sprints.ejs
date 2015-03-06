@@ -85,8 +85,6 @@ $(document).ready(function () {
         });
     }
 
-    $(".datepicker").kendoDatePicker();
-
     //Comment Dialog Grid
     function showComment(e) {
         sprintCommentWin = $("#sprintCommentDialog")
@@ -371,8 +369,16 @@ $(document).ready(function () {
         projectDropDownList.value(dataItem.project_id);
         $("#planned_points").val(dataItem.planned_points);
         $("#actual_points").val(dataItem.actual_points);
-        $("#start_date").val(dataItem.start_date);
-        $("#end_date").val(dataItem.end_date);
+
+        $("#start_date").kendoDatePicker({
+            format: "MM/dd/yyyy",
+            value: reformatDateForInput(dataItem.start_date)
+        });
+        $("#end_date").kendoDatePicker({
+            format: "MM/dd/yyyy",
+            value: reformatDateForInput(dataItem.end_date)
+        });
+
         $("#non_scored_tasks").val(dataItem.non_scored_tasks);
         $("#standard_story_points").val(dataItem.standard_story_points);
         $("#research_spike_points").val(dataItem.research_spike_points);
@@ -477,11 +483,11 @@ $(document).ready(function () {
 
                     <br/>
                     <label for="start_date">Start Date</label>
-                    <input id="start_date" class="datepicker"/>
+                    <input id="start_date" type="text" style="max-width:152px;"/>
 
                     <br/>
                     <label for="end_date">End Date</label>
-                    <input id="end_date" class="datepicker"/>
+                    <input id="end_date" type="text" style="max-width:152px;"/>
 
                     <br/>
                     <label for="standard_story_points">Standard Story Points</label>
