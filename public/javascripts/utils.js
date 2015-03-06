@@ -12,12 +12,12 @@ function getUrlParam(name, url) {
 }
 
 function reformatDateForInput(dateVal) {
-    var yearVal = dateVal.getFullYear().toString();
-    var monthVal = (dateVal.getMonth() + 1).toString();
+    var yearVal = dateVal.getUTCFullYear().toString();
+    var monthVal = (dateVal.getUTCMonth() + 1).toString();
     if (monthVal.length == 1) {
         monthVal = '0' + monthVal;
     }
-    var dateVal = (dateVal.getDate()).toString();
+    var dateVal = (dateVal.getUTCDate()).toString();
     if (dateVal.length == 1) {
         dateVal = '0' + dateVal;
     }

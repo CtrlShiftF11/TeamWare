@@ -253,8 +253,8 @@ $(document).ready(function () {
                     height: 450,
                     toolbar: kendo.template($("#gridTemplate").html()),
                     columns: [
-                        { field: "start_date", title: "Start Date", width: "100px", template: '#= kendo.toString(start_date, "MM/dd/yyyy") #' },
-                        { field: "end_date", title: "End Date", width: "100px", template: '#= kendo.toString(end_date, "MM/dd/yyyy") #' },
+                        { field: "start_date", title: "Start Date", width: "100px", template: '#= reformatDateForInput(start_date) #' },
+                        { field: "end_date", title: "End Date", width: "100px", template: '#= reformatDateForInput(end_date) #' },
                         { field: "team_id", title: "Team", width: "180px", values: teams },
                         { field: "project_id", title: "Project", width: "180px", values: projects },
                         { field: "planned_points", title: "Planned Points", width: "80px"},
@@ -300,8 +300,16 @@ $(document).ready(function () {
         $("#projectList").val('');
         $("#planned_points").val('');
         $("#actual_points").val('');
-        $("#start_date").val('');
-        $("#end_date").val('');
+
+        $("#start_date").kendoDatePicker({
+            format: "MM/dd/yyyy",
+            value: ""
+        });
+        $("#end_date").kendoDatePicker({
+            format: "MM/dd/yyyy",
+            value: ""
+        });
+
         $("#non_scored_tasks").val('');
         $("#standard_story_points").val('');
         $("#research_spike_points").val('');
@@ -496,6 +504,14 @@ $(document).ready(function () {
                     <br/>
                     <label for="research_spike_points">Research Spike Points</label>
                     <input type="number" id="research_spike_points"/>
+
+                    <br/>
+                    <label for="refactor_points">Refactor Points</label>
+                    <input type="number" id="refactor_points_points"/>
+
+                    <br/>
+                    <label for="non_scored_tasks">Non Scored Tasks</label>
+                    <input type="number" id="non_scored_tasks"/>
 
                     <br/>
                     <label for="new_defects">New Defects</label>
