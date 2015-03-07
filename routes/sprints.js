@@ -7,7 +7,8 @@ var Sprint = require('../models/Sprint.js');
 
 //All
 router.get('/', function (req, res, next) {
-    Sprint.find(function (err, Sprints) {
+    var qry = Sprint.find().sort({"end_date": -1});
+    qry.exec(function (err, Sprints) {
         if (err) {
             return next(err);
         }

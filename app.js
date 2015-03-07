@@ -48,6 +48,7 @@ app.use('/', routes);
 //Page Routes...
 app.use('/views/about', routes);
 app.use('/views/projects', routes);
+app.use('/views/help', routes);
 app.use('/views/teams', teams);
 app.use('/views/teamdistributionbystate', teams);
 app.use('/views/sprints', sprints);
@@ -55,6 +56,7 @@ app.use('/views/sprintsbyteam', sprints);
 app.use('/views/actualvsplannedbyteam', sprints);
 app.use('/views/actualvsplannedbyproject', sprints);
 app.use('/views/users', users);
+app.use('/views/system', system);
 
 //API Routes
 app.use('/projects', projects);

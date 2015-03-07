@@ -15,7 +15,15 @@ router.get('/views/index', function (req, res) {
 });
 
 router.get('/views/about', function (req, res) {
-    res.render('about', { title: 'TeamWare | Home' });
+    res.render('about', { title: 'TeamWare | About' });
+});
+
+router.get('/views/system', function (req, res) {
+    res.render('system', {title: 'TeamWare | System'});
+});
+
+router.get('/views/help', function (req, res) {
+    res.render('help', {title: 'TeamWare | Help'});
 });
 
 router.get('/views/users', function (req, res) {
@@ -49,4 +57,5 @@ router.get('/views/actualvsplannedbyproject', function (req, res) {
 router.get('/views/teamdistributionbystate', function (req, res) {
     res.render('teamdistributionbystate', {title: 'TeamWare'});
 });
+
 module.exports = router;

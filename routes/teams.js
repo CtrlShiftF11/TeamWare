@@ -7,7 +7,8 @@ var Team = require('../models/Team.js');
 
 //All
 router.get('/', function (req, res, next) {
-    Team.find(function (err, teams) {
+    var qry = Team.find().sort({"name": 1})
+    qry.exec(function (err, teams) {
         if (err) {
             return next(err);
         }
