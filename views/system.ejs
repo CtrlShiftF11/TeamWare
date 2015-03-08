@@ -3,15 +3,84 @@
 <html>
 <%= include partials/navmenu %>
 <head>
+    <style>
+        .downloadLinks {
+            margin-right: 4px;
+        }
+    </style>
     <script>
         $(document).ready(function () {
+            $("#exportMongoDB").on('click', function (e) {
+                e.preventDefault();
+                $("#exportMongoDB").attr('disabled', 'disabled');
+                if ($(".downloadLinks:first").is(":visible")) {
+                    $(".downloadLinks").hide('slow');
+                }
+                //Generate Export Files...
+                $.ajax({
+                    url: "system/exportmongodbtojson",
+                    type: "POST",
+                    contentType: "application/json",
+                    dataType: "json"
+                })
+                        .success(function (res) {
+                            $("#downloadSprints").attr("href", "../downloads/exports/" + res.sprintResourceLocation).show('slow');
+                            $("#downloadTeams").attr("href", "../downloads/exports/" + res.teamResourceLocation).show('slow');
+                            $("#downloadProjects").attr("href", "../downloads/exports/" + res.projectResourceLocation).show('slow');
+                            $("#downloadUsers").attr("href", "../downloads/exports/" + res.userResourceLocation).show('slow');
+                        })
+                        .fail(function () {
+                            alert('Unable to generate JSON export files');
+                        })
+                        .always(function () {
+                            $("#exportMongoDB").removeAttr('disabled');
+                        });
+            })
         });
 
     </script>
 </head>
 
 <body>
-<h2>Settings</h2>
+
+<div style="width:670px;" class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Database Exporter</h3>
+    </div>
+    <div class="panel-body">
+        <div style="float:left; width: 420px;">
+            <img src="../images/mongodblogo.jpeg" style="border-style:solid; border-width:1px; border-color:silver; border-radius: 6px; margin: 10px;"/>
+            <span class="glyphicon glyphicon-arrow-right" style="font-size: 3.2em; height: 80px;"></span>
+            <img src="../images/jsondb.png" style="border-style:solid; border-width:1px; border-color:silver; border-radius: 6px; margin: 10px;"/>
+        </div>
+        <p style="text-align: left">
+            Want your data? Whoop there it is - I thought you knew! In all seriousness, please keep in mind that using this feature can impact the performance
+            of
+            a running MongoDB.
+            If you have several users accessing this application then you should hold off exporting until a scheduled maintenance period or at least
+            delaying until such a time when system usage is minimal.<br/><br/>
+            <span style="color:red;">WARNING:</span> We cannot reliably represent BSON data accurately in JSON format in very certain and
+            specific scenarios. This probably won't be an issue for you unless you've customized the underlying schema model of the TeamWare database but at any
+            rate, consider yourself warned.
+        </p>
+        <br/>
+        <a id="downloadSprints" download class="btn btn-primary pull-right downloadLinks" style="display:none;">
+            <span class="glyphicon glyphicon-download"></span>&nbsp;Download
+            Sprints</a>
+        <a id="downloadTeams" download class="btn btn-primary pull-right downloadLinks" style="display:none;">
+            <span class="glyphicon glyphicon-download"></span>&nbsp;Download
+            Teams</a>
+        <a id="downloadProjects" download class="btn btn-primary pull-right downloadLinks " style="display:none;">
+            <span class="glyphicon glyphicon-download"></span>&nbsp;Download
+            Projects</a>
+        <a id="downloadUsers" download class="btn btn-primary pull-right downloadLinks" style="display:none;">
+            <span class="glyphicon glyphicon-download"></span>&nbsp;Download
+            Users</a>
+
+        <div style="clear:both; height: 20px;"></div>
+        <a id="exportMongoDB" class="btn btn-primary pull-right"><span class="glyphicon glyphicon-eject"></span>&nbsp;Export Data</a>
+    </div>
+</div>
 
 </body>
 </html>

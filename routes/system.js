@@ -1,14 +1,101 @@
 //Andy Sandefer
 var express = require('express');
 var router = express.Router();
-
 var mongoose = require('mongoose');
+var fs = require('fs');
+var path = require('path');
+var uuid = require('uuid');
 
 var Project = require('../models/Project.js');
 var Sprint = require('../models/Sprint.js');
 var Team = require('../models/Team.js');
 var User = require('../models/User.js');
 
+//Bundle up collection data into JSON files and give the power back to the people...
+router.post('/exportmongodbtojson', function (req, res, next) {
+    var downloadPath = './public/downloads/exports/';
+    var resourceLocations = {};
+
+    //Sprints...
+    var sprintQry = Sprint.find().sort({"end_date": -1});
+    sprintQry.exec(function (err, sprintExport) {
+        if (err) {
+            return next(err);
+        }
+        else {
+            var sprintFilename = 'sprintexport' + uuid.v4() + '.json';
+            fs.writeFile(downloadPath + sprintFilename, JSON.stringify((sprintExport)), function (err) {
+                if (err) {
+                    return next('Unable to stream Sprint Export file\n' + err);
+                }
+                else {
+                    resourceLocations["sprintResourceLocation"] = sprintFilename;
+                }
+            });
+        }
+    });
+
+    //Teams...
+    var teamQry = Team.find().sort({"name": 1});
+    teamQry.exec(function (err, teamExport) {
+        if (err) {
+            return next(err);
+        }
+        else {
+            var teamFilename = 'teamexport' + uuid.v4() + '.json';
+            fs.writeFile(downloadPath + teamFilename, JSON.stringify((teamExport)), function (err) {
+                if (err) {
+                    return next('Unable to stream Team Export file\n' + err);
+                }
+                else {
+                    resourceLocations["teamResourceLocation"] = teamFilename;
+                }
+            });
+        }
+    });
+
+    //Projects...
+    var projectQry = Project.find().sort({"name": 1});
+    projectQry.exec(function (err, projectExport) {
+        if (err) {
+            return next(err);
+        }
+        else {
+            var projectFilename = 'projectexport' + uuid.v4() + '.json';
+            fs.writeFile(downloadPath + projectFilename, JSON.stringify((projectExport)), function (err) {
+                if (err) {
+                    return next('Unable to stream Project Export file\n' + err);
+                }
+                else {
+                    resourceLocations["projectResourceLocation"] = projectFilename;
+                }
+            });
+        }
+    });
+
+    //Users...
+    var userQry = User.find().sort({"name": 1});
+    userQry.exec(function (err, userExport) {
+        if (err) {
+            return next(err);
+        }
+        else {
+            var userFilename = 'userexport' + uuid.v4() + '.json';
+            fs.writeFile(downloadPath + userFilename, JSON.stringify((userExport)), function (err) {
+                if (err) {
+                    return next('Unable to stream User Export file\n' + err);
+                }
+                else {
+                    resourceLocations["userResourceLocation"] = userFilename;
+                    //Holla back...
+                    res.json(resourceLocations);
+                }
+            });
+        }
+    });
+});
+
+//Reset MongoDB to demo state...
 function onInsert(err, documents) {
     if (err) {
         return next(err);
@@ -17,7 +104,6 @@ function onInsert(err, documents) {
         console.info('%docs documents were inserted!', documents.length);
     }
 }
-
 router.post('/resetmongodb', function (req, res, next) {
     Sprint.remove({}, function (err) {
         if (err) {
