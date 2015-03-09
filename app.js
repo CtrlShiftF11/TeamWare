@@ -22,10 +22,9 @@ app.set('view engine', 'ejs');
 // mongoose connector...
 var mongoose = require('mongoose');
 
-// I'd like to have this hostname passed in through ENV var
-//   Currently though 'mongodb' is the name of one of the Docker
-//   containers running through docker-compose
+//Todo: Alter configuration to allow hostname to be an environment variable - 'mongodb' is presently a named docker container
 mongoose.connect('mongodb://mongodb/teamware', function (err) {
+//mongoose.connect('mongodb://localhost/teamware', function (err) {
     if (err) {
         console.log('connection error', err);
     }
@@ -34,8 +33,7 @@ mongoose.connect('mongodb://mongodb/teamware', function (err) {
     }
 });
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(__dirname + '/public/favicon.ico'));
+app.use(favicon(__dirname + '/public/images/favicons/favicon.ico'));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));

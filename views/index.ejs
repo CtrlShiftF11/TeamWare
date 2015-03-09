@@ -6,26 +6,37 @@
 <head>
     <script>
         $(document).ready(function () {
+
+            $("#reportFilter").focus();
             $("#reportFilter").on('keyup', function (e) {
                 if (e.keyCode == 27 || $(this).val() == '') {
                     //Test for Esc key - if pressed then clear all Filters...
-                    $(this).val('');
-                    $(".reportPanel").removeClass('visible').show().addClass('visible');
+                    resetReportFilter();
                 }
                 else {
                     filterList('.reportPanel', $(this).val());
                 }
             });
-        });
 
-        //Filter as you type baddassery...
-        function filterList(selector, query) {
-            query = $.trim(query);
-            query = query.replace(/ /gi, '|');
-            $(selector).each(function () {
-                ($(this).text().search(new RegExp(query, "i")) < 0) ? $(this).hide().removeClass('visible') : $(this).show().addClass('visible');
+            $("#btnResetReportFilter").on('click', function () {
+                resetReportFilter();
             });
-        }
+
+            //Reset Report Filter...
+            function resetReportFilter() {
+                $("#reportFilter").val('');
+                $(".reportPanel").removeClass('visible').show().addClass('visible');
+            }
+
+            //Filter as you type baddassery...
+            function filterList(selector, query) {
+                query = $.trim(query);
+                query = query.replace(/ /gi, '|');
+                $(selector).each(function () {
+                    ($(this).text().search(new RegExp(query, "i")) < 0) ? $(this).hide().removeClass('visible') : $(this).show().addClass('visible');
+                });
+            }
+        });
 
     </script>
 
@@ -34,12 +45,13 @@
 
 <div id="reportFilterCont" style="margin-bottom: 20px;">
     <label for="reportFilter">Report Filter</label>
-    <input id="reportFilter" type="text" placeholder="Search">
+    <input id="reportFilter" type="text" placeholder="Search" style="border-radius: 6px; width: 260px;">
+    <a id="btnResetReportFilter" class="btn btn-primary">Reset</a>
 </div>
 <div style="clear:both;"/>
 <p style="font-weight: bold;">Pardon my dust - I will be replacing the "View" buttons with actual icons but for now I need a way to launch a report!</p>
 
-<div class="panel panel-default reportPanel">
+<div class="panel panel-primary reportPanel">
     <div class="panel-heading">Sprint Work Composition by Team</div>
     <div class="panel-body">
         Get a comprehensive view of the types of work that a team performed over an extended period of time.
@@ -47,15 +59,15 @@
     </div>
 </div>
 
-<div class="panel panel-default reportPanel">
-    <div class="panel-heading">Actual vs Planned by Team</div>
+<div class="panel panel-primary reportPanel">
+    <div class="panel-heading ">Actual vs Planned by Team</div>
     <div class="panel-body">
         Analyze what a team planned against what was actually accomplished.
         <a href="/views/actualvsplannedbyteam" class="btn btn-default center-block">View</a>
     </div>
 </div>
 
-<div class="panel panel-default reportPanel">
+<div class="panel panel-primary reportPanel">
     <div class="panel-heading">Actual vs Planned by Project</div>
     <div class="panel-body">
         Contrast planned story points against actual story points for an entire project.
@@ -63,7 +75,7 @@
     </div>
 </div>
 
-<div class="panel panel-default reportPanel">
+<div class="panel panel-primary reportPanel">
     <div class="panel-heading">Team Distribution by State</div>
     <div class="panel-body">
         View a distribution map of the United States that highlights exactly where our development resources are located.
@@ -71,7 +83,7 @@
     </div>
 </div>
 
-<div class="panel panel-default reportPanel">
+<div class="panel panel-primary reportPanel">
     <div class="panel-heading">Executive Dashboard</div>
     <div class="panel-body">
         Interact with an Executive Dashboard that features data converged with comments from team members.

@@ -336,7 +336,7 @@ $(document).ready(function () {
             actual_points: $("#actual_points").val(),
             start_date: $("#start_date").val(),
             end_date: $("#end_date").val(),
-            non_scored_points: $("#non_scored_tasks").val(),
+            non_scored_tasks: $("#non_scored_tasks").val(),
             standard_story_points: $("#standard_story_points").val(),
             research_spike_points: $("#research_spike_points").val(),
             refactor_points: $("#refactor_points").val(),
@@ -404,7 +404,7 @@ $(document).ready(function () {
         $("#deleteSprintWin").modal('show');
     }
 
-    $("#btnDeleteTeam").on('click', function () {
+    $("#btnDeleteSprint").on('click', function (e) {
         deleteSprint();
     });
 
@@ -551,7 +551,7 @@ $(document).ready(function () {
             </div>
             <div class="modal-footer">
                 <button id="btnCancelDelete" class="btn btn-default pull-right" data-dismiss="modal">Cancel</button>
-                <button id="btnDeleteTeam" class="btn btn-default pull-right">
+                <button id="btnDeleteSprint" class="btn btn-default pull-right">
                     <span class="glyphicon glyphicon-remove">&nbsp;Delete</span>
                 </button>
             </div>
