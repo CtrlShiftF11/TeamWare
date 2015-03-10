@@ -12,6 +12,9 @@ function renderChart(sprintData, renderTarget) {
             renderTo: renderTarget,
             type: 'column'
         },
+        credits: {
+            enabled: false
+        },
         title: {
             text: 'Work Composition by Sprint'
         },

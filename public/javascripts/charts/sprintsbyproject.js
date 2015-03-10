@@ -12,6 +12,9 @@ function renderCompChart(sprintData, renderTarget) {
             renderTo: renderTarget,
             type: 'column'
         },
+        credits: {
+            enabled: false
+        },
         title: {
             text: 'Work Composition by Sprint'
         },
@@ -51,6 +54,5 @@ function renderCompChart(sprintData, renderTarget) {
         chartOptions.series[1].data.push([Date.parse(endDate), sprintData[i].research_spike_points]);
         chartOptions.series[2].data.push([Date.parse(endDate), sprintData[i].refactor_points]);
     }
-    console.log(chartOptions);
     var chart = new Highcharts.Chart(chartOptions);
 }

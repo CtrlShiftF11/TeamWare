@@ -35,6 +35,39 @@
             width: 400px;
             height: 300px;
             float: left;
+            border-style: solid;
+            border-width: 1px;
+            border-radius: 6px;
+            margin-right: 6px;
+            padding: 6px;;
+        }
+
+        #reportFilters {
+            float: left;
+            margin-right: 10px;
+            border-style: solid;
+            border-width: 1px;
+            border-radius: 6px;
+            padding-left: 20px;
+            padding-top: 20px;
+
+        }
+
+        #reportCont {
+            float: left;
+            padding: 6px;
+        }
+
+        .datePicker {
+            max-width: 120px;
+        }
+
+        #reportFilterToggle {
+            width: 20px;
+            height: 600px;
+            float: left;
+            background: linear-gradient(#ffffff, cornflowerblue);
+            cursor: pointer;
         }
 
     </style>
@@ -66,6 +99,39 @@
                     .fail(function () {
                         alert('Unable to retrieve project data');
                     })
+
+            //Get Teams
+            $("#teamSelector").kendoMultiSelect({
+                placeholder: "Team Filter...",
+                dataValueField: "_id",
+                dataTextField: "name",
+                autoBind: false,
+                dataSource: {
+                    transport: {
+                        read: {
+                            url: "/teams/",
+                            dataType: "json",
+                            type: "GET",
+                            contentType: "application/json"
+                        }
+                    }
+                }
+            });
+
+            //Datepickers
+            $("#fromDate").kendoDatePicker({
+                format: "MM/dd/yyyy",
+                value: ""
+            });
+            $("#toDate").kendoDatePicker({
+                format: "MM/dd/yyyy",
+                value: ""
+            });
+
+            $("#reportFilterToggle").on('click', function (e) {
+                $("#reportFilterPanel").fadeToggle();
+            });
+
         });
 
     </script>
@@ -73,17 +139,34 @@
 
 <body>
 
-<div class="panel panel-primary">
-    <div class="panel-heading">Dashboard Filters</div>
-    <div class="panel-body" style="height: 120px;">
-        <div id="coverflowCont">
+<div id="reportFilters">
+    <div id="reportFilterPanel" style="width: 320px; height: 600px; float: left;">
+        <div style="width:290px; height: 140px;">
+            <div id="coverflowCont">
+            </div>
         </div>
+        <div style="clear: both; height: 20px;"></div>
+        <div>
+            <label for="fromDate">From</label>
+            <input id="fromDate" class="datePicker">
+            <label for="toDate">To</label>
+            <input id="toDate" class="datePicker">
+        </div>
+        <div style="clear: both; height: 20px;"></div>
+        <div style="width:290px; max-height: 160px;">
+            <select id="teamSelector" multiple="multiple">
+            </select>
+        </div>
+    </div>
+    <div id="reportFilterToggle">
     </div>
 </div>
 
-<div style="clear:both;"/>
-<div id="projectChart" class="microChart"></div>
-<div id="projectCompChart" class="microChart"></div>
+
+<div id="reportCont">
+    <div id="projectChart" class="microChart"></div>
+    <div id="projectCompChart" class="microChart"></div>
+</div>
 
 
 </body>

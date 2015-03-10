@@ -12,6 +12,9 @@ function renderChart(sprintData) {
             renderTo: 'teamChart',
             type: 'spline'
         },
+        credits: {
+            enabled: false
+        },
         title: {
             text: 'Planned vs. Actual by Sprint'
         },

@@ -12,6 +12,9 @@ function renderChart(sprintData, renderTarget) {
             renderTo: renderTarget,
             type: 'spline'
         },
+        credits: {
+            enabled: false
+        },
         title: {
             text: 'Planned vs. Actual by Sprint'
         },
@@ -41,6 +44,5 @@ function renderChart(sprintData, renderTarget) {
         chartOptions.series[0].data.push([Date.parse(endDate), sprintData[i].actual_points]);
         chartOptions.series[1].data.push([Date.parse(endDate), sprintData[i].planned_points]);
     }
-    console.log(chartOptions);
     var chart = new Highcharts.Chart(chartOptions);
 }
