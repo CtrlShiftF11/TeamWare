@@ -3,6 +3,7 @@
 <%= include partials/navmenu %>
 <head>
     <script src="/javascripts/highcharts.js"></script>
+    <script src="/javascripts/charts/sprintsbyteam.js"></script>
     <script>
         $(document).ready(function () {
             $("#teamList").kendoDropDownList({
@@ -19,64 +20,12 @@
                     }
                 },
                 dataBound: function (e) {
-                    getSprintByTeam(this.value());
+                    getSprintByTeam(this.value(), 'sprintByTeamChart');
                 },
                 change: function (e) {
-                    getSprintByTeam(this.value());
+                    getSprintByTeam(this.value(), 'sprintByTeamChart');
                 }
             });
-
-            function getSprintByTeam(teamId) {
-                $.getJSON('/sprints/getbyteam/' + teamId)
-                        .done(function (sprintData) {
-                            renderChart(sprintData);
-                        });
-            }
-
-            function renderChart(sprintData) {
-                var chartOptions = {
-                    chart: {
-                        renderTo: 'container',
-                        type: 'column'
-                    },
-                    title: {
-                        text: 'Work Composition by Sprint'
-                    },
-                    xAxis: {
-                        type: 'datetime',
-                        labels: {
-                            formatter: function () {
-                                return Highcharts.dateFormat('%m/%d/%y', this.value);
-                            }
-                        }
-                    },
-                    series: [
-                        {
-                            name: 'Story Points',
-                            data: []
-                        },
-                        {
-                            name: 'Research Spike Points',
-                            data: []
-                        },
-                        {
-                            name: 'Refactor Points',
-                            data: []
-                        }
-                    ],
-                    plotOptions: {
-                        column: {
-                            stacking: 'normal'
-                        }
-                    }
-                };
-                for (var i = 0; i < sprintData.length; i++) {
-                    chartOptions.series[0].data.push([Date.parse(sprintData[i].end_date), sprintData[i].standard_story_points]);
-                    chartOptions.series[1].data.push([Date.parse(sprintData[i].end_date), sprintData[i].research_spike_points]);
-                    chartOptions.series[2].data.push([Date.parse(sprintData[i].end_date), sprintData[i].refactor_points]);
-                }
-                var chart = new Highcharts.Chart(chartOptions);
-            }
 
         });
     </script>
@@ -85,7 +34,7 @@
 <body>
 
 <div id="teamList"></div>
-<div id="container"></div>
+<div id="sprintByTeamChart"></div>
 
 </body>
 </html>

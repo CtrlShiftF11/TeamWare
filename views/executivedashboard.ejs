@@ -6,6 +6,7 @@
     <script src="../javascripts/coverflow.min.js"></script>
     <script src="../javascripts/highcharts.js"></script>
     <script src="../javascripts/charts/actualvsplannedbyproject.js"></script>
+    <script src="../javascripts/charts/sprintsbyproject.js"></script>
 
     <link rel="stylesheet" type="text/css" href="../stylesheets/coverflow/coverflow.css"/>
 
@@ -30,6 +31,12 @@
             text-align: center;
         }
 
+        .microChart {
+            width: 400px;
+            height: 300px;
+            float: left;
+        }
+
     </style>
 
     <script>
@@ -47,8 +54,8 @@
                                 $(".projectTileSelected").removeClass("projectTileSelected");
                                 $(this).addClass("projectTileSelected");
                                 var projectId = $(this).data("_id");
-                                console.log(projectId);
                                 getSprintByProject(projectId, 'projectChart');
+                                getSprintCompositionByProject(projectId, 'projectCompChart');
                             });
                         });
                         $("#coverflowCont").coverflow({
@@ -75,8 +82,8 @@
 </div>
 
 <div style="clear:both;"/>
-<div id="projectChart" style="width: 400px; height: 300px;">
-</div>
+<div id="projectChart" class="microChart"></div>
+<div id="projectCompChart" class="microChart"></div>
 
 
 </body>

@@ -51,7 +51,10 @@ router.get('/getbyproject/:project_id', function (req, res, next) {
             $group: {
                 _id: { month: { $month: '$end_date' }, dayOfMonth: { $dayOfMonth: '$end_date' }, year: { $year: '$end_date' } },
                 actual_points: { $sum: '$actual_points' },
-                planned_points: { $sum: '$planned_points' }
+                planned_points: { $sum: '$planned_points' },
+                refactor_points: { $sum: '$refactor_points' },
+                standard_story_points: { $sum: '$standard_story_points' },
+                research_spike_points: { $sum: '$research_spike_points' }
             }
         },
         { $sort: { '_id.year': 1, '_id.month': 1, '_id.dayOfMonth': 1}}
