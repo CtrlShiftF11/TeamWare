@@ -139,7 +139,7 @@
                     var grid = e.sender;
                     var row = grid.dataItem(this.select());
                     window.selectedProjectId = row._id;
-                    getSprintByProject(row._id);
+                    getSprintByProject(row._id, 'projectChart');
                 }
             });
 

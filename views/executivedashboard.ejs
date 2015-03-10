@@ -4,6 +4,9 @@
 <%= include partials/navmenu %>
 <head>
     <script src="../javascripts/coverflow.min.js"></script>
+    <script src="../javascripts/highcharts.js"></script>
+    <script src="../javascripts/charts/actualvsplannedbyproject.js"></script>
+
     <link rel="stylesheet" type="text/css" href="../stylesheets/coverflow/coverflow.css"/>
 
     <style>
@@ -31,24 +34,31 @@
 
     <script>
         $(document).ready(function () {
+
+            //Get Projects
             $.getJSON('/projects')
-                    .done(function (projectData) {
+                    .success(function (projectData) {
                         $.each(projectData, function (i, data) {
                             var projectId = 'project' + data["_id"];
-                            var divString = "<div id='" + projectId + "' class='projectTile'>" + data["name"] + "</div>";
-                            console.log(divString);
+                            var divString = "<div id='" + projectId + "' class='projectTile' data-_id='" + data["_id"] + "'>" + data["name"] + "</div>";
                             $("#coverflowCont").append(divString);
+                            //Project Selection handler...
+                            $("#" + projectId).on('click', function (e) {
+                                $(".projectTileSelected").removeClass("projectTileSelected");
+                                $(this).addClass("projectTileSelected");
+                                var projectId = $(this).data("_id");
+                                console.log(projectId);
+                                getSprintByProject(projectId, 'projectChart');
+                            });
                         });
                         $("#coverflowCont").coverflow({
                             width: 500
                         });
-                    });
-
-            $("div").delegate('.projectTile', 'click', function (e) {
-                $(".projectTileSelected").removeClass("projectTileSelected");
-                $(this).addClass("projectTileSelected");
-            });
-
+                        $(".projectTile:first").trigger('click');
+                    })
+                    .fail(function () {
+                        alert('Unable to retrieve project data');
+                    })
         });
 
     </script>
@@ -59,12 +69,13 @@
 <div class="panel panel-primary">
     <div class="panel-heading">Dashboard Filters</div>
     <div class="panel-body" style="height: 120px;">
-
         <div id="coverflowCont">
         </div>
-
-
     </div>
+</div>
+
+<div style="clear:both;"/>
+<div id="projectChart" style="width: 400px; height: 300px;">
 </div>
 
 

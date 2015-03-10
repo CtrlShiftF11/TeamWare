@@ -1,15 +1,15 @@
 //Andy Sandefer
-function getSprintByProject(projectId) {
+function getSprintByProject(projectId, renderTarget) {
     $.getJSON('/sprints/getbyproject/' + projectId)
         .done(function (sprintData) {
-            renderChart(sprintData);
+            renderChart(sprintData, renderTarget);
         });
 }
 
-function renderChart(sprintData) {
+function renderChart(sprintData, renderTarget) {
     var chartOptions = {
         chart: {
-            renderTo: 'projectChart',
+            renderTo: renderTarget,
             type: 'spline'
         },
         title: {
