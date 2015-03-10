@@ -55,6 +55,7 @@ app.use('/views/actualvsplannedbyteam', sprints);
 app.use('/views/actualvsplannedbyproject', sprints);
 app.use('/views/users', users);
 app.use('/views/system', system);
+app.use('/views/executivedashboard', routes);
 
 //API Routes
 app.use('/projects', projects);
