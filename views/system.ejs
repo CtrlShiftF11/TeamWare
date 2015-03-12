@@ -72,20 +72,26 @@
             })
 
             function getJIRARapidBoards() {
-                $.ajax({
+                var jiraCall = {
                     type: 'POST',
                     url: 'system/jira',
                     data: JSON.stringify({ url: $("#root_api_url").val() }),
                     dataType: 'json',
                     contentType: 'application/json'
-                })
-                        .done(function (data) {
-                            console.log(data);
-                            var data = data.views;
-                            var jiraTemplate = kendo.template($("#jira-board-template").html());
-                            console.log(jiraTemplate);
-                            var result = jiraTemplate(data);
-                            $("#jiraMap").html(result);
+                };
+                //So here's some compact promise badassery...
+                $.when($.ajax(jiraCall), $.getJSON('/teams'))
+                        .done(function (rapidBoardData, teamData) {
+                            var subTemplateString = "<option value=0></option>";
+                            $.each(teamData[0], function (i, data) {
+                                subTemplateString += "<option value=" + data["_id"] + ">" + data["name"] + "</option>";
+                            });
+                            var rapidBoardDataObj = $.parseJSON(rapidBoardData[0]);
+                            $.each(rapidBoardDataObj.views, function (i, data) {
+                                var templateString = "<tr><td>" + data["id"] + "</td><td>" + data["name"] + "</td><td><select>" + subTemplateString + "</select></td></tr>";
+                                $("#jiraBoardMap").append(templateString);
+                            });
+                            $(".tableWrapper").show('fade');
                         });
             }
 
@@ -93,14 +99,6 @@
 
     </script>
 
-    <script type="text/x-kendo-template" id="jira-board-template">
-        # for (var i = 0; i < data.length; i++) { #
-        <tr>
-            <td>#= data[i].id #</td>
-            <td>#= data[i].name #</td>
-        </tr>
-        # } #
-    </script>
 </head>
 
 <body>
@@ -190,16 +188,20 @@
                 <label for="root_api_url">JIRA API URL</label>
                 <input type="text" id="root_api_url" style="width:320px;"/>
                 <a id="btnGetJiraBoards" class="btn btn-primary"><span class="glyphicon glyphicon-cloud"></span>&nbsp;Connect</a>
-                <table>
-                    <thead>
-                    <tr>
-                        <td>Rapid Board Id</td>
-                        <td>Name</td>
-                    </tr>
-                    </thead>
-                    <tbody id="jiraMap">
-                    </tbody>
-                </table>
+
+                <div class="tableWrapper" style="height: 300px; overflow: auto; display:none;">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <td>Rapid Board Id</td>
+                            <td>Name</td>
+                        </tr>
+                        </thead>
+                        <tbody id="jiraBoardMap">
+                        </tbody>
+                    </table>
+                </div>
+
             </form>
         </div>
     </div>
