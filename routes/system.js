@@ -5,11 +5,35 @@ var mongoose = require('mongoose');
 var fs = require('fs');
 var path = require('path');
 var uuid = require('uuid');
+var https = require('https');
 
 var Project = require('../models/Project.js');
 var Sprint = require('../models/Sprint.js');
 var Team = require('../models/Team.js');
 var User = require('../models/User.js');
+var JiraSettings = require('../models/JiraSettings.js');
+
+//Gather JIRA Rapid Boards for System Settings JIRA Integration feature...
+router.post('/jira', function (req, res, next) {
+    var jiraApiUrl = req.body.url;
+    var reqOptions = {
+        host: jiraApiUrl,
+        path: '/rest/greenhopper/1.0/rapidview/',
+        port: 443
+    };
+    var body = '';
+    https.get(reqOptions, function (jiraRes) {
+        jiraRes.on('data', function (d) {
+            body += d;
+        });
+        jiraRes.on('end', function (e) {
+            res.json(body);
+        });
+        jiraRes.on('error', function (e) {
+            console.log('Yep sure enough an error has occurred - just your luck - here\'s the info bro\n' + e.message);
+        });
+    });
+});
 
 //Bundle up collection data into JSON files and give the power back to the people...
 router.post('/exportmongodbtojson', function (req, res, next) {
