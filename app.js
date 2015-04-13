@@ -13,6 +13,7 @@ var sprints = require('./routes/sprints');
 var users = require('./routes/users');
 var system = require('./routes/system');
 var jirasettings = require('./routes/jirasettings');
+var tests = require('./routes/tests');
 
 var app = express();
 
@@ -20,19 +21,35 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-// mongoose connector...
-var mongoose = require('mongoose');
 
-//Todo: Alter configuration to allow hostname to be an environment variable - 'mongodb' is presently a named docker container
-mongoose.connect('mongodb://mongodb/teamware', function (err) {
-//mongoose.connect('mongodb://localhost/teamware', function (err) {
-    if (err) {
-        console.log('connection error', err);
-    }
-    else {
-        console.log('teamware connection successful');
+//// mongoose connector...
+//var mongoose = require('mongoose');
+//
+////Todo: Alter configuration to allow hostname to be an environment variable - 'mongodb' is presently a named docker container
+//mongoose.connect('mongodb://mongodb/teamware', function (err) {
+////mongoose.connect('mongodb://localhost/teamware', function (err) {
+//    if (err) {
+//        console.log('connection error', err);
+//    }
+//    else {
+//        console.log('teamware connection successful');
+//    }
+//});
+
+var knex = require('knex')({
+    client: 'pg',
+    connection: {
+        host     : '127.0.0.1',
+        user     : 'Andy',
+        password : '',
+        database : 'inspector'
     }
 });
+
+var bookshelf = require('bookshelf')(knex);
+app.set('bookshelf', bookshelf);
+
+var bookshelf = app.get('bookshelf');
 
 app.use(favicon(__dirname + '/public/images/favicons/favicon.ico'));
 app.use(logger('dev'));
@@ -65,6 +82,7 @@ app.use('/sprints', sprints);
 app.use('/users', users);
 app.use('/system', system);
 app.use('/jirasettings', jirasettings);
+app.use('/tests', test);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
