@@ -22,8 +22,6 @@ router.get('/source', function(req, res, next){
                 auth: 'asandefer:smolder1',
                 port: 443
             };
-            console.log(JiraSettings[0].root_api_url);
-            console.log(options);
             var body = '';
             https.get(options, function(jiraRes){
                 jiraRes.on('data', function(d){
