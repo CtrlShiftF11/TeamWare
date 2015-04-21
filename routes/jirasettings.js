@@ -18,5 +18,16 @@ router.get('/', function (req, res, next) {
     });
 });
 
+router.post('/', function(req, res, next){
+    var qry = { _id: req.params.id };
+    JiraSettings.findOneAndUpdate(qry, req.body, {upsert: true}, function(err, doc){
+        if (err){
+            next(err);
+        }
+        else{
+            res.json(res.body);
+        }
+    });
+});
 
 module.exports = router;

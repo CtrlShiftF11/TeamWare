@@ -14,6 +14,17 @@ var User = require('../models/User.js');
 var JiraSettings = require('../models/JiraSettings.js');
 var JiraAdapter = require('../services/jiraAdapter.js');
 
+router.get('/', function(req, res, next){
+   JiraSettings.findOne({}, function(err, res){
+       if (err){
+           next(err);
+       }
+       else{
+           res.json(res.body);
+       }
+   });
+});
+
 //Gather JIRA Rapid Boards for System Settings JIRA Integration feature...
 router.post('/jira', function (req, res, next) {
     var jiraAdapter = new JiraAdapter({jiraApiUrl: req.body.url});
@@ -209,7 +220,6 @@ router.post('/resetmongodb', function (req, res, next) {
 
 //Respond...
     res.json({'jobStatus': 'MongoDB Refresh Complete - It\'s All Good!'});
-})
-;
+});
 
 module.exports = router;

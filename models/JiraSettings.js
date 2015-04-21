@@ -11,7 +11,9 @@ var RapidBoardMapSchema = new mongoose.Schema({
 
 var JiraSettingsSchema = new mongoose.Schema({
     root_api_url: String,
+    greenhopper_path: String,
     last_modified_date: { type: Date, default: Date.now },
+    basic_auth_val: String,
     rapid_board_map: [RapidBoardMapSchema]
 });
 

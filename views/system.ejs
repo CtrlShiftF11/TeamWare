@@ -7,9 +7,16 @@
         .downloadLinks {
             margin-right: 4px;
         }
+
+        label{
+            width:125px;
+        }
+
     </style>
     <script>
         $(document).ready(function () {
+            getJiraSettings();
+
             $("#exportMongoDB").on('click', function (e) {
                 e.preventDefault();
                 $("#exportMongoDB").attr('disabled', 'disabled');
@@ -66,6 +73,11 @@
                         });
             });
 
+            $("#btnSaveJiraSettings").on('click', function(e){
+                e.preventDefault();
+                saveJiraSettings();
+            });
+
             $("#btnGetJiraBoards").on('click', function (e) {
                 e.preventDefault();
                 getJIRARapidBoards();
@@ -95,6 +107,43 @@
                         });
             }
 
+            function getJiraSettings(){
+                $.getJSON("/jirasettings")
+                        .done(function(res){
+                            $("#root_api_url").val(res[0].root_api_url);
+                            $("#greenhopper_path").val(res[0].greenhopper_path);
+                            var decodedBasicAuthVal = atob(res[0].basic_auth_val).split(":");
+                            $("#jira_user_id").val(decodedBasicAuthVal[0]);
+                            $("#jira_password").val(decodedBasicAuthVal[1]);
+                        })
+                        .fail(function(){
+                            alert('Error: Unable to get JIRA settings.');
+                        });
+            }
+
+            function saveJiraSettings(){
+                var jiraSettings = {
+                    _id: window.jiraSettingsId,
+                    root_api_url: $("#root_api_url").val(),
+                    greenhopper_path: $("#greenhopper_path").val(),
+                    basic_auth_val: btoa($("#jira_user_id").val() + ":" + $("#jira_password").val())
+                };
+                $.ajax({
+                    url: "/jirasettings/",
+                    type: "POST",
+                    dataType: "json",
+                    data: JSON.stringify(jiraSettings),
+                    contentType: "application/json"
+                })
+                        .done(function(res){
+                            console.log(res);
+                            alert('JIRA settings saved.');
+                        })
+                        .fail(function(){
+                            alert('Unable to save JIRA settings.');
+                        });
+            }
+
         });
 
     </script>
@@ -104,7 +153,7 @@
 <body>
 
 <div style="width:680px; float: left;">
-    <div style="width:650px; margin-right:10px;" class="panel panel-primary pull-left">
+    <div style="width:670px; margin-right:10px;" class="panel panel-primary pull-left">
         <div class="panel-heading">
             <h3 class="panel-title">Database Exporter</h3>
         </div>
@@ -144,7 +193,7 @@
         </div>
     </div>
 
-    <div style="width:650px;" class="panel panel-primary pull-left">
+    <div style="width:670px;" class="panel panel-primary pull-left">
         <div class="panel-heading">
             <h3 class="panel-title">System Reset</h3>
         </div>
@@ -177,7 +226,7 @@
 </div>
 
 <div style="width:610px; float: left;">
-    <div style="width:590px; margin-right:10px;" class="panel panel-primary pull-left">
+    <div style="width:490px; margin-right:10px;" class="panel panel-primary pull-left">
         <div class="panel-heading">
             <h3 class="panel-title">JIRA Integration</h3>
         </div>
@@ -187,7 +236,17 @@
             <form>
                 <label for="root_api_url">JIRA API URL</label>
                 <input type="text" id="root_api_url" style="width:320px;"/>
-                <a id="btnGetJiraBoards" class="btn btn-primary"><span class="glyphicon glyphicon-cloud"></span>&nbsp;Connect</a>
+                <!--<a id="btnGetJiraBoards" class="btn btn-primary"><span class="glyphicon glyphicon-cloud"></span>&nbsp;Connect</a>-->
+                <label for="greenhopper_path">Greenhopper Path</label>
+                <input type="text" id="greenhopper_path" style="width:320px;"/>
+                <br/>
+                <label for="jira_user_id">JIRA User Id</label>
+                <input type="text" id="jira_user_id"/>
+                <br/>
+                <label for="jira_password">JIRA Password</label>
+                <input type="password" id="jira_password">
+                <br/>
+                <a id="btnSaveJiraSettings" class="btn btn-primary pull-right"><span class="glyphicon glyphicon-save"></span>&nbsp;Save</a>
 
                 <div class="tableWrapper" style="height: 300px; overflow: auto; display:none;">
                     <table class="table table-striped">
