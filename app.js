@@ -13,6 +13,7 @@ var sprints = require('./routes/sprints');
 var users = require('./routes/users');
 var system = require('./routes/system');
 var jirasettings = require('./routes/jirasettings');
+var jiraprojects = require('./routes/jiraprojects');
 
 var app = express();
 
@@ -65,6 +66,7 @@ app.use('/sprints', sprints);
 app.use('/users', users);
 app.use('/system', system);
 app.use('/jirasettings', jirasettings);
+app.use('/jiraprojects', jiraprojects);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
