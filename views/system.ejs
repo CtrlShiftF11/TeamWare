@@ -119,6 +119,13 @@
                         .fail(function(){
                             alert('Error: Unable to get JIRA settings.');
                         });
+                $.getJSON("/jiraprojects/source")
+                        .done(function(res){
+                            console.log(res);
+                        })
+                        .fail(function(){
+                            alert('Error: Unable to get JIRA Projects.');
+                        });
             }
 
             function saveJiraSettings(){

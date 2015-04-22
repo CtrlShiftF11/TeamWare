@@ -28,7 +28,8 @@ router.get('/source', function(req, res, next){
                     body += d;
                 });
                 jiraRes.on('end', function(e){
-                    res.json(body);
+                    res.type('json');
+                    res.send(body);
                 });
                 jiraRes.on('error', function(e){
                     console.log('Bad stuff has occurred...\n' + e.message);
