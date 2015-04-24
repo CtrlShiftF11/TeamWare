@@ -62,4 +62,8 @@ router.get('/views/executivedashboard', function (req, res) {
     res.render('executivedashboard', { title: 'TeamWare' });
 });
 
+router.get('/views/jiraburndown', function(req, res){
+    res.render('jiraburndown', { title: 'TeamWare'});
+});
+
 module.exports = router;

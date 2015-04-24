@@ -28,8 +28,22 @@ router.get('/source', function(req, res, next){
                     body += d;
                 });
                 jiraRes.on('end', function(e){
-                    res.type('json');
-                    res.send(body);
+                    //res.type('json');
+                    //res.send(body);
+                    var bodyObj = JSON.parse(body);
+                    for (var i = 0; i < bodyObj.length; i++){
+                        var qry = { id: bodyObj[i]["id"] };
+                        JiraProject.findOneAndUpdate(qry, bodyObj[i], { upsert: true }, function(err, doc){
+                            if (err){
+                                next(err);
+                            }
+                            else{
+                                console.log('JIRA project upsert is complete!');
+                            }
+                        });
+                    }
+                    //res.send({"itWorked": true});
+                    res.send(bodyObj);
                 });
                 jiraRes.on('error', function(e){
                     console.log('Bad stuff has occurred...\n' + e.message);

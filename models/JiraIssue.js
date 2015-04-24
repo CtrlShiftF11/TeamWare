@@ -51,29 +51,21 @@ var JiraStatusSchema = new mongoose.Schema({
 //Primary Issue Schema with nested objects...
 var JiraIssueSchema = new mongoose.Schema({
     expand: String,
-    startAt: Number,
-    maxResults: Number,
-    total: Number,
-    issues: [
-        {
-            expand: String,
-            id: Number,
-            self: String,
-            key: String,
-            fields : {
-                summary: String,
-                project: [JiraProjectSchema],
-                team: [JiraTeamSchema],
-                epic_id: String,
-                issuetype: [JiraIssueTypeSchema],
-                status: [JiraStatusSchema],
-                updated: String,
-                created: String,
-                description: String,
-                story_points: Number
-            }
-        }
-    ]
+    id: Number,
+    self: String,
+    key: String,
+    fields : {
+        summary: String,
+        project: [JiraProjectSchema],
+        team: [JiraTeamSchema],
+        epic_id: String,
+        issuetype: [JiraIssueTypeSchema],
+        status: [JiraStatusSchema],
+        updated: String,
+        created: String,
+        description: String,
+        story_points: Number
+    }
 });
 
 module.exports = mongoose.model('JiraIssues', JiraIssueSchema);

@@ -23,3 +23,14 @@ function reformatDateForInput(dateVal) {
     }
     return monthVal + '/' + dateVal + '/' + yearVal;
 }
+
+function reformatDateForJira(dateVal) {
+    //This function is NOT intended to operate on true JavaScript Date Objects!
+    //This accepts a string value representing a date from a date picker widget and
+    //transforms the format of MM/DD/YYYY into YYYY/MM/DD
+
+    //console.log('type is ' + jQuery.type(dateVal));
+    var dateParts = [];
+    dateParts = dateVal.split('/');
+    return dateParts[2] + '/' + dateParts[0] + '/' + dateParts[1];
+}
