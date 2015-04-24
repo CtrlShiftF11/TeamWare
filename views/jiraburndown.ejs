@@ -5,8 +5,10 @@
 <head>
     <script src="../javascripts/coverflow.min.js"></script>
     <script src="../javascripts/highcharts.js"></script>
-    <script src="../javascripts/charts/actualvsplannedbyproject.js"></script>
-    <script src="../javascripts/charts/sprintsbyproject.js"></script>
+    <script src="/javascripts/highmaps.js"></script>
+    <script src="/javascripts/treemap.js"></script>
+    <!--<script src="../javascripts/charts/actualvsplannedbyproject.js"></script>-->
+    <!--<script src="../javascripts/charts/sprintsbyproject.js"></script>-->
 
     <link rel="stylesheet" type="text/css" href="../stylesheets/coverflow/coverflow.css"/>
 
@@ -62,13 +64,13 @@
             max-width: 120px;
         }
 
-        #reportFilterToggle {
-            width: 20px;
-            height: 600px;
-            float: left;
-            background: linear-gradient(#ffffff, cornflowerblue);
-            cursor: pointer;
-        }
+        /*#reportFilterToggle {*/
+            /*width: 20px;*/
+            /*height: 600px;*/
+            /*float: left;*/
+            /*background: linear-gradient(#ffffff, cornflowerblue);*/
+            /*cursor: pointer;*/
+        /*}*/
 
     </style>
 
@@ -126,7 +128,17 @@
             });
 
             $("#reportFilterToggle").on('click', function (e) {
-                $("#reportFilterPanel").slideToggle(200);
+                //$("#reportFilterPanel").slideToggle(200);
+                if ($("#filterWidgets").is(":visible")){
+                    $("#filterWidgets").slideUp(200, function(){
+                        $("#reportFilterToggle").text("Show");
+                    });
+                }
+                else{
+                    $("#filterWidgets").slideDown(200, function(){
+                        $("#reportFilterToggle").text("Hide");
+                    });
+                }
             });
 
             $("#btnSearch").on('click', function(e){
@@ -142,7 +154,83 @@
                             //Test Code...
                             $.getJSON('/jiraissues/burndown?projectId=' + encodeURIComponent(projectId) + '&startDate=' + reformatDateForJira(startDate) + '&endDate=' + reformatDateForJira(endDate))
                                     .done(function(burndownData){
+                                        console.log('MongoDB issue data...');
                                         console.log(burndownData);
+                                        $("#reportFilterToggle").trigger('click');
+                                        var resolvedCount = 0;
+                                        var openCount = 0;
+                                        var reviewCount = 0;
+                                        var onHoldCount = 0;
+                                        var approvedCount = 0;
+
+                                        $.each(burndownData, function(i, data){
+                                            var status = data["fields"]["status"][0].name;
+                                            switch(status) {
+                                                case 'Open' :
+                                                    openCount += 1;
+                                                    break;
+                                                case 'Closed' :
+                                                    resolvedCount += 1;
+                                                    break;
+                                                case 'In Review' :
+                                                    reviewCount += 1;
+                                                    break;
+                                                case 'Approved' :
+                                                    approvedCount += 1;
+                                                case 'On Hold' :
+                                                    onHoldCount += 1;
+                                                default:
+                                                    openCount += 1;
+                                            }
+                                        });
+                                        //Chart...
+                                        var chartOptions = {
+                                            chart: {
+                                                renderTo: renderTarget
+                                            },
+                                            colorAxis: {
+                                                minColor: '#FFFFFF',
+                                                maxColor: Highcharts.getOptions().colors[0]
+                                            },
+                                            credits: {
+                                                enabled: false
+                                            },
+                                            title: {
+                                                text: 'Project Progress Overview'
+                                            },
+                                            series: [{
+                                                type: "treemap",
+                                                layoutAlgorithm: "squarified",
+                                                data: [
+                                                    {
+                                                        name: 'Open',
+                                                        value: openCount,
+                                                        color: '#6699FF'
+                                                    },
+                                                    {
+                                                        name: 'Closed/Resolved',
+                                                        value: resolvedCount,
+                                                        color: '#FFFF66'
+                                                    },
+                                                    {
+                                                        name: 'On Hold',
+                                                        value: onHoldCount,
+                                                        color: '#FF6666'
+                                                    },
+                                                    {
+                                                        name: 'Approved',
+                                                        value: approvedCount,
+                                                        color: '#FF6666'
+                                                    },
+                                                    {
+                                                        name: 'In Review',
+                                                        value: reviewCount,
+                                                        color: '#669999'
+                                                    }
+                                                ]
+                                            }]
+                                        };
+                                        var chart = new Highcharts.Chart(chartOptions);
                                     })
                                     .fail(function(jqxhr, textStatus, error){
                                         alert('Error: ' + textStatus + '\n' + error);
@@ -153,37 +241,6 @@
                         });
             }
 
-//            //Filter JIRA Projects
-//            $("#projectFilter").focus();
-//            $("#projectFilter").on('keyup', function (e) {
-//                if (e.keyCode == 27 || $(this).val() == '') {
-//                    //Test for Esc key - if pressed then clear all Filters...
-//                    resetProjectFilter();
-//                }
-//                else {
-//                    filterList('.projectTile', $(this).val());
-//                }
-//            });
-//
-//            $("#btnResetProjectFilter").on('click', function () {
-//                resetProjectFilter();
-//            });
-//
-//            //Reset Report Filter...
-//            function resetProjectFilter() {
-//                $("#projectFilter").val('');
-//                $(".projectTile").removeClass('visible').show().addClass('visible');
-//            }
-//
-//            //Filter as you type baddassery...
-//            function filterList(selector, query) {
-//                query = $.trim(query);
-//                query = query.replace(/ /gi, '|');
-//                $(selector).each(function () {
-//                    ($(this).text().search(new RegExp(query, "i")) < 0) ? $(this).hide().removeClass('visible') : $(this).show().addClass('visible');
-//                });
-//            }
-
         });
 
     </script>
@@ -192,49 +249,35 @@
 <body>
 
 <div id="reportFilters">
-    <div id="reportFilterPanel" style="width: 990px; height: 600px; float: left;">
-        <!--<div id="reportFilterCont" style="margin-bottom: 20px;">-->
-            <!--<label for="projectFilter">Project Filter</label>-->
-            <!--<input id="projectFilter" type="text" placeholder="Search" style="border-radius: 6px; width: 260px;">-->
-            <!--<a id="btnResetProjectFilter" class="btn btn-primary">Reset</a>-->
-        <!--</div>-->
-        <!--<div style="clear:both;"/>-->
-        <div style="width:960px; height: 140px;">
-            <div id="coverflowCont">
+    <div id="reportFilterPanel" style="width: 1300px; float: left;">
+        <div id="filterWidgets">
+            <div style="width:1260px; height: 140px;">
+                <div id="coverflowCont">
+                </div>
+            </div>
+            <div style="clear: both; height: 20px;"></div>
+            <div style="float: left;">
+                <label for="fromDate">From</label>
+                <input id="fromDate" class="datePicker">
+                <label for="toDate">To</label>
+                <input id="toDate" class="datePicker">
+            </div>
+            <div style="clear: both; height: 20px;"></div>
+            <div style="width:290px; max-height: 160px;">
+                <select id="teamSelector" multiple="multiple">
+                </select>
             </div>
         </div>
-        <div style="clear: both; height: 20px;"></div>
-        <div>
-            <label for="fromDate">From</label>
-            <input id="fromDate" class="datePicker">
-            <label for="toDate">To</label>
-            <input id="toDate" class="datePicker">
+        <div style="margin-top:6px;">
+            <a id="reportFilterToggle" class="btn btn-default pull-left" style="margin-left: 20px; margin-bottom:20px;">Hide</a>
+            <a id="btnSearch" class="btn btn-default pull-right" style="margin-right: 20px;margin-bottom: 20px;"><span class="glyphicon glyphicon-search"></span>&nbsp;Search</a>
         </div>
-        <div style="clear: both; height: 20px;"></div>
-        <div style="width:290px; max-height: 160px;">
-            <select id="teamSelector" multiple="multiple">
-            </select>
-        </div>
-        <div style="clear: both; height: 20px;"></div>
-        <div>
-            <a id="btnSearch" class="btn btn-default pull-right">Search</a>
-        </div>
-
-    </div>
-    <div id="reportFilterToggle">
     </div>
 </div>
 
+<div id="renderTarget" style="width:1300px; height: 570px;">
 
-<!--<div id="reportCont">-->
-    <!--<div id="projectChart" class="microChart"></div>-->
-    <!--<div id="projectCompChart" class="microChart"></div>-->
-<!--</div>-->
-
-<!--<div id="commentCont">-->
-
-<!--</div>-->
-
+</div>
 
 </body>
 </html>
