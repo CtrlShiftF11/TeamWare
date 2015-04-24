@@ -46,7 +46,8 @@ router.get('/source', function(req, res, next){
                            }
                         });
                     }
-                    res.send({"itWorked": true});
+                    //res.send({"itWorked": true});
+                    res.send(bodyObj);
                 });
                 jiraRes.on('error', function(e){
                     console.log('Bad stuff has occurred...\n' + e.message);
@@ -58,6 +59,28 @@ router.get('/source', function(req, res, next){
 
 router.get('/', function(req, res, next){
     var qry = JiraIssue.find();
+    qry.exec(function(err, JiraIssues){
+        if (err){
+            return next(err);
+        }
+        else{
+            res.json(JiraIssues);
+        }
+    });
+});
+
+router.get('/burndown', function(req, res, next){
+    var startDateParts = req.query.startDate.split('/');
+    var startDate = new Date(startDateParts[0], startDateParts[1] - 1, startDateParts[2]);
+    console.log(startDateParts);
+    console.log(startDate);
+    var endDateParts = req.query.endDate.split('/');
+    var endDate = new Date(endDateParts[0], endDateParts[1] - 1, endDateParts[2]);
+    console.log('project is ' + req.query.projectId);
+    console.log('here comes the var');
+    console.log({"fields.project.key" : req.query.projectId , "fields.updated": {"$gte": startDate.toISOString(), "$lte": endDate.toISOString()}});
+    var qry = JiraIssue.find({"fields.project.key" : req.query.projectId , "fields.updated": {"$gte": startDate.toISOString(), "$lte": endDate.toISOString()}});
+
     qry.exec(function(err, JiraIssues){
         if (err){
             return next(err);

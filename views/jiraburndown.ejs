@@ -12,8 +12,8 @@
 
     <style>
         .projectTile {
-            width: 110px;
-            height: 90px;
+            width: 180px;
+            height: 130px;
             border-style: solid;
             border-width: 1px;
             background: linear-gradient(#000000, gray);
@@ -79,49 +79,23 @@
                 .done(function(projectData){
                     $.each(projectData, function (i, data) {
                         var projectId = 'project' + data["key"];
-                        var divString = "<div id='" + projectId + "' class='projectTile' data-id='" + data["key"] + "'>" + data["name"] + "</div>";
+                        var divString = "<div id='" + projectId + "' class='projectTile' data-id='" + data["key"] + "'>" + data["name"] + "<div style='clear:both'/><img src='" + data["avatarUrls"]["48x48"] + "'/>" + "</div>";
                         $("#coverflowCont").append(divString);
                         //Project Selection handler...
                         $("#" + projectId).on('click', function (e) {
                             $(".projectTileSelected").removeClass("projectTileSelected");
                             $(this).addClass("projectTileSelected");
-                            var projectId = $(this).data("_id");
-                            window.selectedProjectId = projectId;
+                            window.selectedProjectId = $(this).data("id");
                         });
                     });
                     $("#coverflowCont").coverflow({
-                        width: 800
+                        width: 1200
                     });
+                    $(".projectTile:first").trigger('click');
                 })
                 .fail(function(jqxhr, textStatus, error){
                     alert('Error: ' + textStatus + '\n' + error);
                 });
-
-//            //Get Projects
-//            $.getJSON('/projects')
-//                    .success(function (projectData) {
-//                        $.each(projectData, function (i, data) {
-//                            var projectId = 'project' + data["_id"];
-//                            var divString = "<div id='" + projectId + "' class='projectTile' data-_id='" + data["_id"] + "'>" + data["name"] + "</div>";
-//                            $("#coverflowCont").append(divString);
-//                            //Project Selection handler...
-//                            $("#" + projectId).on('click', function (e) {
-//                                $(".projectTileSelected").removeClass("projectTileSelected");
-//                                $(this).addClass("projectTileSelected");
-//                                var projectId = $(this).data("_id");
-//                                window.selectedProjectId = projectId;
-//                                getSprintByProject(projectId, 'projectChart');
-//                                getSprintCompositionByProject(projectId, 'projectCompChart');
-//                            });
-//                        });
-//                        $("#coverflowCont").coverflow({
-//                            width: 500
-//                        });
-//                        $(".projectTile:first").trigger('click');
-//                    })
-//                    .fail(function () {
-//                        alert('Unable to retrieve project data');
-//                    })
 
             //Get Teams
             $("#teamSelector").kendoMultiSelect({
@@ -156,9 +130,6 @@
             });
 
             $("#btnSearch").on('click', function(e){
-                //TEMP SLOP CODE TO TEST...
-                window.selectedProjectId = 'TM';
-
                 e.preventDefault();
                 getJiraIssues(window.selectedProjectId, $("#fromDate").val(), $("#toDate").val());
             });
@@ -167,11 +138,51 @@
                 $.getJSON('/jiraissues/source?projectId=' + encodeURIComponent(projectId) + '&startDate=' + reformatDateForJira(startDate) + '&endDate=' + reformatDateForJira(endDate))
                         .done(function(jiraIssues){
                             console.log(jiraIssues);
+
+                            //Test Code...
+                            $.getJSON('/jiraissues/burndown?projectId=' + encodeURIComponent(projectId) + '&startDate=' + reformatDateForJira(startDate) + '&endDate=' + reformatDateForJira(endDate))
+                                    .done(function(burndownData){
+                                        console.log(burndownData);
+                                    })
+                                    .fail(function(jqxhr, textStatus, error){
+                                        alert('Error: ' + textStatus + '\n' + error);
+                                    });
                         })
                         .fail(function(jqxhr, textStatus, error){
                             alert('Error: ' + textStatus + '\n' + error);
                         });
             }
+
+//            //Filter JIRA Projects
+//            $("#projectFilter").focus();
+//            $("#projectFilter").on('keyup', function (e) {
+//                if (e.keyCode == 27 || $(this).val() == '') {
+//                    //Test for Esc key - if pressed then clear all Filters...
+//                    resetProjectFilter();
+//                }
+//                else {
+//                    filterList('.projectTile', $(this).val());
+//                }
+//            });
+//
+//            $("#btnResetProjectFilter").on('click', function () {
+//                resetProjectFilter();
+//            });
+//
+//            //Reset Report Filter...
+//            function resetProjectFilter() {
+//                $("#projectFilter").val('');
+//                $(".projectTile").removeClass('visible').show().addClass('visible');
+//            }
+//
+//            //Filter as you type baddassery...
+//            function filterList(selector, query) {
+//                query = $.trim(query);
+//                query = query.replace(/ /gi, '|');
+//                $(selector).each(function () {
+//                    ($(this).text().search(new RegExp(query, "i")) < 0) ? $(this).hide().removeClass('visible') : $(this).show().addClass('visible');
+//                });
+//            }
 
         });
 
@@ -181,8 +192,14 @@
 <body>
 
 <div id="reportFilters">
-    <div id="reportFilterPanel" style="width: 630px; height: 600px; float: left;">
-        <div style="width:600px; height: 140px;">
+    <div id="reportFilterPanel" style="width: 990px; height: 600px; float: left;">
+        <!--<div id="reportFilterCont" style="margin-bottom: 20px;">-->
+            <!--<label for="projectFilter">Project Filter</label>-->
+            <!--<input id="projectFilter" type="text" placeholder="Search" style="border-radius: 6px; width: 260px;">-->
+            <!--<a id="btnResetProjectFilter" class="btn btn-primary">Reset</a>-->
+        <!--</div>-->
+        <!--<div style="clear:both;"/>-->
+        <div style="width:960px; height: 140px;">
             <div id="coverflowCont">
             </div>
         </div>
