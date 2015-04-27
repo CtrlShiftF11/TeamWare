@@ -4,11 +4,10 @@
 <%= include partials/navmenu %>
 <head>
     <script src="../javascripts/coverflow.min.js"></script>
-    <script src="../javascripts/highcharts.js"></script>
+    <!--<script src="../javascripts/highcharts.js"></script>-->
     <script src="/javascripts/highmaps.js"></script>
     <script src="/javascripts/treemap.js"></script>
-    <!--<script src="../javascripts/charts/actualvsplannedbyproject.js"></script>-->
-    <!--<script src="../javascripts/charts/sprintsbyproject.js"></script>-->
+    <script src="../javascripts/charts/jiraprojectstatus.js"></script>
 
     <link rel="stylesheet" type="text/css" href="../stylesheets/coverflow/coverflow.css"/>
 
@@ -64,17 +63,10 @@
             max-width: 120px;
         }
 
-        /*#reportFilterToggle {*/
-            /*width: 20px;*/
-            /*height: 600px;*/
-            /*float: left;*/
-            /*background: linear-gradient(#ffffff, cornflowerblue);*/
-            /*cursor: pointer;*/
-        /*}*/
-
     </style>
 
     <script>
+        $(document).ajaxError(ajaxErrorHandler);
         $(document).ready(function () {
 
             $.getJSON("/jiraprojects/source")
@@ -94,9 +86,6 @@
                         width: 1200
                     });
                     $(".projectTile:first").trigger('click');
-                })
-                .fail(function(jqxhr, textStatus, error){
-                    alert('Error: ' + textStatus + '\n' + error);
                 });
 
             //Get Teams
@@ -128,7 +117,6 @@
             });
 
             $("#reportFilterToggle").on('click', function (e) {
-                //$("#reportFilterPanel").slideToggle(200);
                 if ($("#filterWidgets").is(":visible")){
                     $("#filterWidgets").slideUp(200, function(){
                         $("#reportFilterToggle").text("Show");
@@ -143,105 +131,18 @@
 
             $("#btnSearch").on('click', function(e){
                 e.preventDefault();
-                getJiraIssues(window.selectedProjectId, $("#fromDate").val(), $("#toDate").val());
+                sourceJiraIssues(window.selectedProjectId, $("#fromDate").val(), $("#toDate").val());
             });
 
-            function getJiraIssues(projectId, startDate, endDate){
+            function sourceJiraIssues(projectId, startDate, endDate){
                 $.getJSON('/jiraissues/source?projectId=' + encodeURIComponent(projectId) + '&startDate=' + reformatDateForJira(startDate) + '&endDate=' + reformatDateForJira(endDate))
-                        .done(function(jiraIssues){
-                            console.log(jiraIssues);
-
-                            //Test Code...
-                            $.getJSON('/jiraissues/burndown?projectId=' + encodeURIComponent(projectId) + '&startDate=' + reformatDateForJira(startDate) + '&endDate=' + reformatDateForJira(endDate))
-                                    .done(function(burndownData){
-                                        console.log('MongoDB issue data...');
-                                        console.log(burndownData);
-                                        $("#reportFilterToggle").trigger('click');
-                                        var resolvedCount = 0;
-                                        var openCount = 0;
-                                        var reviewCount = 0;
-                                        var onHoldCount = 0;
-                                        var approvedCount = 0;
-
-                                        $.each(burndownData, function(i, data){
-                                            var status = data["fields"]["status"][0].name;
-                                            switch(status) {
-                                                case 'Open' :
-                                                    openCount += 1;
-                                                    break;
-                                                case 'Closed' :
-                                                    resolvedCount += 1;
-                                                    break;
-                                                case 'In Review' :
-                                                    reviewCount += 1;
-                                                    break;
-                                                case 'Approved' :
-                                                    approvedCount += 1;
-                                                case 'On Hold' :
-                                                    onHoldCount += 1;
-                                                default:
-                                                    openCount += 1;
-                                            }
-                                        });
-                                        //Chart...
-                                        var chartOptions = {
-                                            chart: {
-                                                renderTo: renderTarget
-                                            },
-                                            colorAxis: {
-                                                minColor: '#FFFFFF',
-                                                maxColor: Highcharts.getOptions().colors[0]
-                                            },
-                                            credits: {
-                                                enabled: false
-                                            },
-                                            title: {
-                                                text: 'Project Progress Overview'
-                                            },
-                                            series: [{
-                                                type: "treemap",
-                                                layoutAlgorithm: "squarified",
-                                                data: [
-                                                    {
-                                                        name: 'Open',
-                                                        value: openCount,
-                                                        color: '#6699FF'
-                                                    },
-                                                    {
-                                                        name: 'Closed/Resolved',
-                                                        value: resolvedCount,
-                                                        color: '#FFFF66'
-                                                    },
-                                                    {
-                                                        name: 'On Hold',
-                                                        value: onHoldCount,
-                                                        color: '#FF6666'
-                                                    },
-                                                    {
-                                                        name: 'Approved',
-                                                        value: approvedCount,
-                                                        color: '#FF6666'
-                                                    },
-                                                    {
-                                                        name: 'In Review',
-                                                        value: reviewCount,
-                                                        color: '#669999'
-                                                    }
-                                                ]
-                                            }]
-                                        };
-                                        var chart = new Highcharts.Chart(chartOptions);
-                                    })
-                                    .fail(function(jqxhr, textStatus, error){
-                                        alert('Error: ' + textStatus + '\n' + error);
-                                    });
-                        })
-                        .fail(function(jqxhr, textStatus, error){
-                            alert('Error: ' + textStatus + '\n' + error);
+                        .done(function(jiraIssues) {
+                            $("#reportFilterToggle").trigger('click');
+                            getJiraIssues(projectId, startDate, endDate, 'projectStatusTreemap');
                         });
             }
-
         });
+
 
     </script>
 </head>
@@ -275,7 +176,7 @@
     </div>
 </div>
 
-<div id="renderTarget" style="width:1300px; height: 570px;">
+<div id="projectStatusTreemap" style="width:1300px; height: 570px;">
 
 </div>
 

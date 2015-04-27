@@ -23,7 +23,7 @@ router.get('/source', function(req, res, next){
             var options = {
                 host: JiraSettings[0].root_api_url,
                 path: "/rest/api/2/search?jql=" + encodeURIComponent(jql) + '&fields=' + encodeURIComponent(fields) + '&startAt=0&maxResults=500',
-                auth: "asandefer:smolder1",
+                auth: JiraSettings[0].basic_auth_user + ':' + JiraSettings[0].basic_auth_password,
                 port: 443
             };
             var body = '';

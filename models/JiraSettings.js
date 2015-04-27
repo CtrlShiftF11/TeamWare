@@ -14,6 +14,8 @@ var JiraSettingsSchema = new mongoose.Schema({
     greenhopper_path: String,
     last_modified_date: { type: Date, default: Date.now },
     basic_auth_val: String,
+    basic_auth_user: String,
+    basic_auth_password: String,
     rapid_board_map: [RapidBoardMapSchema]
 });
 

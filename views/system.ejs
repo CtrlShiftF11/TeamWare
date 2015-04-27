@@ -14,6 +14,7 @@
 
     </style>
     <script>
+        $(document).ajaxError(ajaxErrorHandler);
         $(document).ready(function () {
             getJiraSettings();
 
@@ -35,9 +36,6 @@
                             $("#downloadTeams").attr("href", "../downloads/exports/" + res.teamResourceLocation).show('slow');
                             $("#downloadProjects").attr("href", "../downloads/exports/" + res.projectResourceLocation).show('slow');
                             $("#downloadUsers").attr("href", "../downloads/exports/" + res.userResourceLocation).show('slow');
-                        })
-                        .fail(function () {
-                            alert('Unable to generate JSON export files');
                         })
                         .always(function () {
                             $("#exportMongoDB").removeAttr('disabled');
@@ -62,9 +60,6 @@
                 })
                         .success(function (res) {
                             alert('Database Reset Complete')
-                        })
-                        .fail(function () {
-                            alert('Unable to reset database');
                         })
                         .always(function () {
                             $("#resetRunning").hide('slow', function () {
@@ -109,16 +104,16 @@
 
             function getJiraSettings(){
                 $.getJSON("/jirasettings")
-                        .done(function(res){
-                            $("#root_api_url").val(res[0].root_api_url);
-                            $("#greenhopper_path").val(res[0].greenhopper_path);
-                            var decodedBasicAuthVal = atob(res[0].basic_auth_val).split(":");
-                            $("#jira_user_id").val(decodedBasicAuthVal[0]);
-                            $("#jira_password").val(decodedBasicAuthVal[1]);
-                        })
-                        .fail(function(){
-                            alert('Error: Unable to get JIRA settings.');
-                        });
+                    .done(function(res){
+                        $("#root_api_url").val(res[0].root_api_url);
+                        $("#greenhopper_path").val(res[0].greenhopper_path);
+                        var decodedBasicAuthVal = atob(res[0].basic_auth_val).split(":");
+                        $("#jira_user_id").val(res[0].basic_auth_user);
+                        $("#jira_password").val(res[0].basic_auth_password);
+                        if (res[0].jiraSettingsId !== null){
+                            window.jiraSettingsId = res[0].jiraSettingsId;
+                        }
+                    });
             }
 
             function saveJiraSettings(){
@@ -126,22 +121,21 @@
                     _id: window.jiraSettingsId,
                     root_api_url: $("#root_api_url").val(),
                     greenhopper_path: $("#greenhopper_path").val(),
-                    basic_auth_val: btoa($("#jira_user_id").val() + ":" + $("#jira_password").val())
+                    basic_auth_val: btoa($("#jira_user_id").val() + ":" + $("#jira_password").val()),
+                    basic_auth_user: $("#jira_user_id").val(),
+                    basic_auth_password: $("#jira_password").val()
                 };
                 $.ajax({
                     url: "/jirasettings/",
                     type: "POST",
                     dataType: "json",
-                    data: JSON.stringify(jiraSettings),
+                    data: JSON.stringify({jiraSettings}),
                     contentType: "application/json"
                 })
-                        .done(function(res){
-                            console.log(res);
-                            alert('JIRA settings saved.');
-                        })
-                        .fail(function(){
-                            alert('Unable to save JIRA settings.');
-                        });
+                    .success(function(res){
+                        console.log(res);
+                        alert('JIRA settings saved.');
+                    });
             }
 
         });

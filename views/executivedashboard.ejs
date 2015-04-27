@@ -96,10 +96,7 @@
                             width: 500
                         });
                         $(".projectTile:first").trigger('click');
-                    })
-                    .fail(function () {
-                        alert('Unable to retrieve project data');
-                    })
+                    });
 
             //Get Teams
             $("#teamSelector").kendoMultiSelect({
@@ -134,9 +131,6 @@
             });
 
             $("#btnSearch").on('click', function(e){
-                //TEMP SLOP CODE TO TEST...
-                window.selectedProjectId = 'TM';
-
                 e.preventDefault();
                 getJiraIssues(window.selectedProjectId, $("#fromDate").val(), $("#toDate").val());
             });
@@ -145,9 +139,6 @@
                 $.getJSON('/jiraissues/source?projectId=' + encodeURIComponent(projectId) + '&startDate=' + reformatDateForJira(startDate) + '&endDate=' + reformatDateForJira(endDate))
                         .done(function(jiraIssues){
                             console.log(jiraIssues);
-                        })
-                        .fail(function(jqxhr, textStatus, error){
-                            alert('Error: ' + textStatus + '\n' + error);
                         });
             }
 

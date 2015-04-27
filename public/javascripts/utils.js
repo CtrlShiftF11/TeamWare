@@ -34,3 +34,7 @@ function reformatDateForJira(dateVal) {
     dateParts = dateVal.split('/');
     return dateParts[2] + '/' + dateParts[0] + '/' + dateParts[1];
 }
+
+ajaxErrorHandler = function (event, jqxhr, settings, thrownError) {
+    alert('Error: ' + thrownError);
+}
