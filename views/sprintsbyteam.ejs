@@ -5,6 +5,7 @@
     <script src="/javascripts/highcharts.js"></script>
     <script src="/javascripts/charts/sprintsbyteam.js"></script>
     <script>
+        $(document).ajaxError(ajaxErrorHandler);
         $(document).ready(function () {
             $("#teamList").kendoDropDownList({
                 dataValueField: "_id",

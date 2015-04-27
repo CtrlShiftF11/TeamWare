@@ -4,6 +4,7 @@
 <%= include partials/navmenu %>
 <head>
     <script>
+        $(document).ajaxError(ajaxErrorHandler);
         $(document).ready(function () {
             var baseUrl = "/users/";
 
@@ -31,9 +32,6 @@
                         .done(function (result) {
                             $("#editUserWin").modal('hide');
                             reloadGrid();
-                        })
-                        .fail(function () {
-                            alert('Unable to save user');
                         })
                         .always(function () {
                             window.selectedUserId = null;
@@ -66,9 +64,6 @@
                 })
                         .done(function (result) {
                             $("#deleteUserWin").modal('hide');
-                        })
-                        .fail(function () {
-                            alert('Unable to delete user');
                         })
                         .always(function () {
                             window.selectedUserId = null;

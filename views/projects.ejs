@@ -34,9 +34,6 @@
                             $("#editProjectWin").modal('hide');
                             reloadGrid();
                         })
-                        .fail(function () {
-                            alert('Unable to save project');
-                        })
                         .always(function () {
                             window.selectedProjectId = null;
                         });
@@ -68,9 +65,6 @@
                 })
                         .done(function (result) {
                             $("#deleteProjectWin").modal('hide');
-                        })
-                        .fail(function () {
-                            alert('Unable to delete project');
                         })
                         .always(function () {
                             window.selectedProjectId = null;

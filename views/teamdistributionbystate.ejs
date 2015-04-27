@@ -9,6 +9,7 @@
     <div id="mapContainer" style="height: 600px; min-width: 510px; max-width: 800px; margin: 0 auto"></div>
 
     <script>
+        $(document).ajaxError(ajaxErrorHandler);
         $(document).ready(function () {
             getDistByTeam();
 

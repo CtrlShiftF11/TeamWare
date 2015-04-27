@@ -6,6 +6,7 @@
     <script src="/javascripts/highcharts.js"></script>
     <script src="/javascripts/charts/actualvsplannedbyteam.js"></script>
     <script>
+        $(document).ajaxError(ajaxErrorHandler);
         $(document).ready(function () {
             var baseUrl = "/teams/";
 
@@ -34,9 +35,6 @@
                         .done(function (result) {
                             $("#editTeamWin").modal('hide');
                             reloadGrid();
-                        })
-                        .fail(function () {
-                            alert('Unable to save team');
                         })
                         .always(function () {
                             window.selectedTeamId = null;
