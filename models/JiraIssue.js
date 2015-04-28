@@ -8,10 +8,10 @@ var JiraProjectSchema = new mongoose.Schema({
     name: String,
     avatarUrls : [
         {
-            img16x16: String,
-            img24x24: String,
-            img32x32: String,
-            img48x48: String
+            "16x16": String,
+            "24x24": String,
+            "32x32": String,
+            "48x48": String
         }
     ]
 });
@@ -57,8 +57,8 @@ var JiraIssueSchema = new mongoose.Schema({
     fields : {
         summary: String,
         project: [JiraProjectSchema],
-        team: [JiraTeamSchema],
-        epic_id: String,
+        customfield_11901: [JiraTeamSchema],  //Team
+        customfield_10600: String, //Epic Id
         issuetype: [JiraIssueTypeSchema],
         status: [JiraStatusSchema],
         updated: String,
